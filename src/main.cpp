@@ -45,15 +45,18 @@ int main(int argc, char *argv[])
 	// Fixed Logic Timestep, Variable Rendering
 	// Robert Nystrom's Game Programming Patterns
 	// http://gameprogrammingpatterns.com/game-loop.html
-	uint32_t previousTicks = SDL_GetTicks();
-	uint32_t laggedTicks = 0;
+	uint32_t previousTime = SDL_GetTicks();
+	uint32_t laggedTime = 0;
 	bool isRunning = true;
 	while (isRunning)
 	{
-		uint32_t currentTicks = SDL_GetTicks();
-		uint32_t elapsedTicks = currentTicks - previousTicks;
-		previousTicks = currentTicks;
-		laggedTicks += elapsedTicks;
+		// Understand that a "tick" means something different in the context of SDL, compared to the context of game logic.
+		// An SDL "tick" is a millisecond.
+		// A game "tick" is a logic step, with a time duration that we define.
+		uint32_t currentTime = SDL_GetTicks();
+		uint32_t elapsedTime = currentTime - previousTime;
+		previousTime = currentTime;
+		laggedTime += elapsedTime;
 
 		// DoInput
 		SDL_Event sdlEvent;
@@ -67,10 +70,10 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		while (laggedTicks >= MS_PER_TICK)
+		while (laggedTime >= MS_PER_TICK)
 		{
 			// DoLogic
-			laggedTicks -= MS_PER_TICK;
+			laggedTime -= MS_PER_TICK;
 		}
 
 		// DoRender
