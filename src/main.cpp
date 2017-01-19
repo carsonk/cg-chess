@@ -1,5 +1,5 @@
+#include <inttypes.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include "SDL.h"
 #include "main.h"
@@ -40,6 +40,11 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
+	
+	// Performance statistics.
+	uint32_t currentFramesPerSecond = 0;
+	uint32_t tickAtMeasurement = 0;
+
 
 	// Game Loop
 	// Fixed Logic Timestep, Variable Rendering
@@ -47,6 +52,8 @@ int main(int argc, char *argv[])
 	// http://gameprogrammingpatterns.com/game-loop.html
 	uint32_t previousTime = SDL_GetTicks();
 	uint32_t laggedTime = 0;
+	uint32_t currentTick = 0;
+	uint32_t currentFrame = 0;
 	bool isRunning = true;
 	while (isRunning)
 	{
@@ -73,11 +80,23 @@ int main(int argc, char *argv[])
 		while (laggedTime >= MS_PER_TICK)
 		{
 			// DoLogic
+
+			currentTick++;
 			laggedTime -= MS_PER_TICK;
 		}
 
 		// DoRender
 		// (laggedTicks / MS_PER_UPDATE * 1.0)
+		currentFrame++;
+
+
+		// Performance statistics.
+		if ((currentTick != 0) && (currentTick != tickAtMeasurement) && (currentTick % TICKS_PER_SECOND == 0))
+		{
+			currentFramesPerSecond = currentFrame - currentFramesPerSecond;
+			tickAtMeasurement = currentTick;
+			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Tick: %" PRIu32 " Frame: %" PRIu32 " FPS: %" PRIu32, currentTick, currentFrame, currentFramesPerSecond);
+		}
 	}
 
 
