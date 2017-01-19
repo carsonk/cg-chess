@@ -15,6 +15,24 @@
 #define MAX_FRAMESKIP (TICKS_PER_SECOND / 4)
 
 
+static void DoInput(uint32_t currentTick)
+{
+
+}
+
+
+static void DoLogic(uint32_t currentTick)
+{
+
+}
+
+
+static void DoRender(uint32_t currentTick, double interpolation)
+{
+
+}
+
+
 int main(int argc, char *argv[])
 {
 	// Stockfish initialization.
@@ -69,7 +87,13 @@ int main(int argc, char *argv[])
 		previousTime = currentTime;
 		laggedTime += elapsedTime;
 
-		// DoInput
+
+		// Core Input Function
+		DoInput(currentTick);
+
+
+		// Little event loop for testing.
+		// Should be moved to input function.
 		SDL_Event sdlEvent;
 		while (SDL_PollEvent(&sdlEvent))
 		{
@@ -84,7 +108,8 @@ int main(int argc, char *argv[])
 		currentFrameskip = 0;
 		while ((laggedTime >= MS_PER_TICK) && currentFrameskip < MAX_FRAMESKIP)
 		{
-			// DoLogic
+			// Core Logic Function
+			DoLogic(currentTick);
 
 			currentTick++;
 			currentFrameskip++;
@@ -97,13 +122,14 @@ int main(int argc, char *argv[])
 			laggedTime -= MS_PER_TICK;
 		}
 
-		// DoRender
-		// (laggedTicks / MS_PER_UPDATE * 1.0)
+
+		// Core Render Function
+		DoRender(currentTick, (laggedTime / (MS_PER_TICK * 1.0)));
 		currentFrame++;
 
 
 		// Performance statistics.
-		if ((currentTick != 0) && (currentTick != tickAtMeasurement) && (currentTick % TICKS_PER_SECOND == 0))
+		if ((currentTick != 0) && (currentTick != tickAtMeasurement) && ((currentTick - tickAtMeasurement) / TICKS_PER_SECOND > 0))
 		{
 			currentFramesPerSecond = currentFrame - frameAtMeasurement;
 			tickAtMeasurement = currentTick;
