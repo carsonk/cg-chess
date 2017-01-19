@@ -12,6 +12,8 @@
 #define TICKS_PER_SECOND (60)
 #define MS_PER_TICK (1000 / TICKS_PER_SECOND)
 
+#define MAX_FRAMESKIP (TICKS_PER_SECOND / 4)
+
 
 int main(int argc, char *argv[])
 {
@@ -44,6 +46,7 @@ int main(int argc, char *argv[])
 	// Performance statistics.
 	uint32_t currentFramesPerSecond = 0;
 	uint32_t tickAtMeasurement = 0;
+	uint32_t frameAtMeasurement = 0;
 
 
 	// Game Loop
@@ -54,6 +57,7 @@ int main(int argc, char *argv[])
 	uint32_t laggedTime = 0;
 	uint32_t currentTick = 0;
 	uint32_t currentFrame = 0;
+	uint32_t currentFrameskip = 0;
 	bool isRunning = true;
 	while (isRunning)
 	{
@@ -77,11 +81,19 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		while (laggedTime >= MS_PER_TICK)
+		currentFrameskip = 0;
+		while ((laggedTime >= MS_PER_TICK) && currentFrameskip < MAX_FRAMESKIP)
 		{
 			// DoLogic
 
 			currentTick++;
+			currentFrameskip++;
+
+			if (currentFrameskip == MAX_FRAMESKIP)
+			{
+				SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Maximum frameskip reached: %" PRIu32 " frames", currentFrameskip);
+			}
+
 			laggedTime -= MS_PER_TICK;
 		}
 
@@ -93,8 +105,9 @@ int main(int argc, char *argv[])
 		// Performance statistics.
 		if ((currentTick != 0) && (currentTick != tickAtMeasurement) && (currentTick % TICKS_PER_SECOND == 0))
 		{
-			currentFramesPerSecond = currentFrame - currentFramesPerSecond;
+			currentFramesPerSecond = currentFrame - frameAtMeasurement;
 			tickAtMeasurement = currentTick;
+			frameAtMeasurement = currentFrame;
 			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Tick: %" PRIu32 " Frame: %" PRIu32 " FPS: %" PRIu32, currentTick, currentFrame, currentFramesPerSecond);
 		}
 	}
