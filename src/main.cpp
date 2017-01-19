@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
 	
 	// Performance statistics.
 	uint32_t currentFramesPerSecond = 0;
-	uint32_t tickAtMeasurement = 0;
-	uint32_t frameAtMeasurement = 0;
+	uint32_t lastMeasurementTick = 0;
+	uint32_t lastMeasurementFrame = 0;
 
 
 	// Game Loop
@@ -129,11 +129,12 @@ int main(int argc, char *argv[])
 
 
 		// Performance statistics.
-		if ((currentTick != 0) && (currentTick != tickAtMeasurement) && ((currentTick - tickAtMeasurement) / TICKS_PER_SECOND > 0))
+		// At least one second before logging.
+		if ((currentTick - lastMeasurementTick) >= TICKS_PER_SECOND)
 		{
-			currentFramesPerSecond = currentFrame - frameAtMeasurement;
-			tickAtMeasurement = currentTick;
-			frameAtMeasurement = currentFrame;
+			currentFramesPerSecond = currentFrame - lastMeasurementFrame;
+			lastMeasurementTick = currentTick;
+			lastMeasurementFrame = currentFrame;
 			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Tick: %" PRIu32 " Frame: %" PRIu32 " FPS: %" PRIu32, currentTick, currentFrame, currentFramesPerSecond);
 		}
 	}
