@@ -118,6 +118,11 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\main.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\.gitignore" />
+    <None Include="..\..\LICENSE.md" />
+    <None Include="..\..\README.md" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
