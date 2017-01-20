@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "SDL.h"
 #include "main.h"
+#include "render.h"
 #include "Stockfish\src\position.h"
 
 #define WINDOW_TITLE "cg-chess"
@@ -29,7 +30,7 @@ static void DoLogic(uint32_t currentTick)
 
 static void DoRender(uint32_t currentTick, double interpolation)
 {
-
+	Render_Draw(currentTick, interpolation);
 }
 
 
@@ -54,6 +55,17 @@ int main(int argc, char *argv[])
 	if (sdlWindow == NULL)
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL_CreateWindow", SDL_GetError(), NULL);
+
+		SDL_Quit();
+
+		return EXIT_FAILURE;
+	}
+
+
+	// Initialize subsystems.
+	if (!Render_Init(RENDERTYPE_2D_VECTOR, sdlWindow, true))
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Render_Init", "Failed to initialize render subsystem.", NULL);
 
 		SDL_Quit();
 
@@ -139,6 +151,9 @@ int main(int argc, char *argv[])
 		}
 	}
 
+
+	// Quit subsystems.
+	Render_Quit();
 
 	SDL_Quit();
 

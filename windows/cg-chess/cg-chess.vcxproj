@@ -141,10 +141,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\render.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\common.h" />
     <ClInclude Include="..\..\src\main.h" />
+    <ClInclude Include="..\..\src\render.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\.gitignore" />
