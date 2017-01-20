@@ -34,3 +34,6 @@ bin
 # Debug files
 *.dSYM/
 *.su
+
+# Visual Studio Files
+.vs
