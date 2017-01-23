@@ -96,6 +96,14 @@ int main(int argc, char *argv[])
 		// A game "tick" is a logic step, with a time duration that we define.
 		uint32_t currentTime = SDL_GetTicks();
 		uint32_t elapsedTime = currentTime - previousTime;
+
+		// Handle overflow of SDL ticks.
+		if (currentTime < previousTime)
+		{
+			elapsedTime = currentTime + (UINT32_MAX - previousTime) + 1;
+			SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "SDL ticks overflowed: currentTime: %" PRIu32 "ms previousTime: %" PRIu32 "ms", currentTime, previousTime);
+		}
+
 		previousTime = currentTime;
 		laggedTime += elapsedTime;
 
