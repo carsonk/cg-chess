@@ -49,19 +49,36 @@ bool Render_Init(RenderType renderType, SDL_Window *sdlWindow, bool vSync)
 		// Must associate SDL renderer with SDL window.
 		assert(sdlWindow != NULL);
 
-		if (vSync)
-		{
-			sdlRenderer = SDL_CreateRenderer(sdlWindow, FIRST_AVAILABLE_DEVICE, SDL_RENDERER_PRESENTVSYNC);
-		}
-		else
-		{
-			sdlRenderer = SDL_CreateRenderer(sdlWindow, FIRST_AVAILABLE_DEVICE, 0);
-		}
+		uint32_t renderFlags = 0;
+		renderFlags |= (vSync ? SDL_RENDERER_PRESENTVSYNC : 0);
+
+		sdlRenderer = SDL_CreateRenderer(sdlWindow, FIRST_AVAILABLE_DEVICE, renderFlags);
 
 		if (sdlRenderer == NULL)
 		{
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Render_Init: Failed to create SDL renderer.");
 			return false;
+		}
+
+		// If vertical synchronization was requested, check that we got it.
+		if (vSync)
+		{
+			SDL_RendererInfo sdlRendererInfo;
+			if (SDL_GetRendererInfo(sdlRenderer, &sdlRendererInfo) != 0)
+			{
+				SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "SDL_GetRendererInfo: %s", SDL_GetError());
+			}
+			else
+			{
+				if ((sdlRendererInfo.flags & SDL_RENDERER_PRESENTVSYNC) != SDL_RENDERER_PRESENTVSYNC)
+				{
+					SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateRenderer: VSync was requested, but was unavailable.");
+				}
+				else
+				{
+					SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateRenderer: VSync is enabled.");
+				}
+			}
 		}
 
 		Init2DVector();
