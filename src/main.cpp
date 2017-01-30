@@ -36,9 +36,21 @@
 #define MAX_FRAMESKIP (TICKS_PER_SECOND / 4)
 
 
+static bool isRunning;
+
+
 static void DoInput(uint32_t currentTick)
 {
-
+    SDL_Event sdlEvent;
+    while (SDL_PollEvent(&sdlEvent))
+    {
+        switch (sdlEvent.type)
+        {
+            case SDL_QUIT:
+                isRunning = false;
+                break;
+        }
+    }
 }
 
 
@@ -108,7 +120,7 @@ int main(int argc, char *argv[])
     uint32_t currentTick = 0;
     uint32_t currentFrame = 0;
     uint32_t currentFrameskip = 0;
-    bool isRunning = true;
+    isRunning = true;
     while (isRunning)
     {
         // Understand that a "tick" means something different in the context of SDL, compared to the context of game logic.
@@ -131,19 +143,6 @@ int main(int argc, char *argv[])
         // Core Input Function
         DoInput(currentTick);
 
-
-        // Little event loop for testing.
-        // Should be moved to input function.
-        SDL_Event sdlEvent;
-        while (SDL_PollEvent(&sdlEvent))
-        {
-            switch (sdlEvent.type)
-            {
-                case SDL_QUIT:
-                    isRunning = false;
-                    break;
-            }
-        }
 
         currentFrameskip = 0;
         while ((laggedTime >= MS_PER_TICK) && currentFrameskip < MAX_FRAMESKIP)
