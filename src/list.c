@@ -419,21 +419,37 @@ bool List_Get(void *list, size_t index, void **existingItem)
 }
 
 
-bool List_Set(void *list, size_t index, void *newItem, void **replacedItem)
+bool List_GetFirst(void *list, void **existingItem)
 {
     if (list == NULL)
         return false;
-    else if (replacedItem == NULL)
+    else if (existingItem == NULL)
         return false;
 
     List *linkedList = (List*)list;
 
-    if (index >= linkedList->count)
+    if (linkedList->head == NULL)
         return false;
 
-    Node *existingNode = GetNodeAt(linkedList, index);
-    *replacedItem = existingNode->item;
-    existingNode->item = newItem;
+    *existingItem = linkedList->head->item;
+
+    return true;
+}
+
+
+bool List_GetLast(void *list, void **existingItem)
+{
+    if (list == NULL)
+        return false;
+    else if (existingItem == NULL)
+        return false;
+
+    List *linkedList = (List*)list;
+
+    if (linkedList->tail == NULL)
+        return false;
+
+    *existingItem = linkedList->tail->item;
 
     return true;
 }

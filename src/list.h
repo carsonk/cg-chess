@@ -44,7 +44,8 @@ bool List_RemoveFirst(void *list, void **removedItem);
 bool List_RemoveLast(void *list, void **removedItem);
 
 bool List_Get(void *list, size_t index, void **existingItem);
-bool List_Set(void *list, size_t index, void *newItem, void **replacedItem);
+bool List_GetFirst(void *list, void **existingItem);
+bool List_GetLast(void *list, void **existingItem);
 
 size_t List_Count(void *list);
 
