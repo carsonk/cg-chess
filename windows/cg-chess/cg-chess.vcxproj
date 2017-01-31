@@ -147,12 +147,14 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\list.c" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\render.cpp" />
     <ClCompile Include="..\..\src\vectorart.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\common.h" />
+    <ClInclude Include="..\..\src\list.h" />
     <ClInclude Include="..\..\src\main.h" />
     <ClInclude Include="..\..\src\render.h" />
     <ClInclude Include="..\..\src\vectorart.h" />
