@@ -36,9 +36,6 @@
     <ClCompile Include="..\..\src\Stockfish\src\evaluate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Stockfish\src\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Stockfish\src\material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

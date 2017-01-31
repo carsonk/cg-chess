@@ -130,7 +130,6 @@
     <ClCompile Include="..\..\src\Stockfish\src\bitboard.cpp" />
     <ClCompile Include="..\..\src\Stockfish\src\endgame.cpp" />
     <ClCompile Include="..\..\src\Stockfish\src\evaluate.cpp" />
-    <ClCompile Include="..\..\src\Stockfish\src\main.cpp" />
     <ClCompile Include="..\..\src\Stockfish\src\material.cpp" />
     <ClCompile Include="..\..\src\Stockfish\src\misc.cpp" />
     <ClCompile Include="..\..\src\Stockfish\src\movegen.cpp" />
