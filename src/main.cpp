@@ -21,6 +21,8 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
+#include "list.h"
 #include "SDL.h"
 #include "main.h"
 #include "render.h"
@@ -36,7 +38,8 @@
 #define MAX_FRAMESKIP (TICKS_PER_SECOND / 4)
 
 
-static bool isRunning;
+bool isRunning;
+void *sdlEventBuffer;
 
 
 static void DoInput(uint32_t currentTick)
@@ -49,6 +52,11 @@ static void DoInput(uint32_t currentTick)
             case SDL_QUIT:
                 isRunning = false;
                 break;
+            default:
+                SDL_Event *bufferedEvent = (SDL_Event*)malloc(sizeof(SDL_Event));
+                memcpy(bufferedEvent, &sdlEvent, sizeof(SDL_Event));
+                List_AddLast(sdlEventBuffer, bufferedEvent);
+                break;
         }
     }
 }
@@ -56,7 +64,7 @@ static void DoInput(uint32_t currentTick)
 
 static void DoLogic(uint32_t currentTick)
 {
-
+    List_Clear(sdlEventBuffer, free);
 }
 
 
@@ -99,6 +107,18 @@ int main(int argc, char *argv[])
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Render_Init", "Failed to initialize render subsystem.", NULL);
 
+        SDL_Quit();
+
+        return EXIT_FAILURE;
+    }
+
+    // Allocate SDL event buffer.
+    sdlEventBuffer = List_Create();
+    if (sdlEventBuffer == NULL)
+    {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "main", "Failed to create buffer for SDL events.", NULL);
+
+        Render_Quit();
         SDL_Quit();
 
         return EXIT_FAILURE;
@@ -181,6 +201,7 @@ int main(int argc, char *argv[])
 
     // Quit subsystems.
     Render_Quit();
+    List_Destroy(sdlEventBuffer, free);
 
     SDL_Quit();
 

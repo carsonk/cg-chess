@@ -24,7 +24,7 @@
 #include <stdlib.h>
 
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 extern "C"
 {
 #endif
@@ -50,6 +50,6 @@ bool List_GetLast(void *list, void **existingItem);
 size_t List_Count(void *list);
 
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 }
 #endif
