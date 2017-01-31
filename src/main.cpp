@@ -22,11 +22,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include "camera.h"
+#include "game.h"
+#include "input.h"
 #include "list.h"
-#include "SDL.h"
 #include "main.h"
 #include "render.h"
-#include "Stockfish\src\position.h"
+#include "SDL.h"
+
 
 #define WINDOW_TITLE "cg-chess"
 #define WINDOW_DEFAULT_WIDTH (640)
@@ -64,6 +67,10 @@ static void DoInput(uint32_t currentTick)
 
 static void DoLogic(uint32_t currentTick)
 {
+    Camera_Logic(currentTick);
+    Input_Logic(currentTick);
+    Game_Logic(currentTick);
+
     List_Clear(sdlEventBuffer, free);
 }
 
@@ -76,9 +83,6 @@ static void DoRender(uint32_t currentTick, double interpolation)
 
 int main(int argc, char *argv[])
 {
-    // Stockfish initialization.
-    Position::init();
-
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
@@ -103,10 +107,55 @@ int main(int argc, char *argv[])
 
 
     // Initialize subsystems.
+
+    // Input Subsystem
+    if (!Input_Init())
+    {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Input_Init", "Failed to initialize input subsystem.", NULL);
+
+        SDL_DestroyWindow(sdlWindow);
+        SDL_Quit();
+
+        return EXIT_FAILURE;
+    }
+
+    // Camera Subsystem
+    if (!Camera_Init())
+    {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Camera_Init", "Failed to initialize camera subsystem.", NULL);
+
+        Input_Quit();
+
+        SDL_DestroyWindow(sdlWindow);
+        SDL_Quit();
+
+        return EXIT_FAILURE;
+    }
+
+    // Game Subsystem
+    if (!Game_Init())
+    {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Game_Init", "Failed to initialize game subsystem.", NULL);
+
+        Camera_Quit();
+        Input_Quit();
+
+        SDL_DestroyWindow(sdlWindow);
+        SDL_Quit();
+
+        return EXIT_FAILURE;
+    }
+
+    // Render Subsystem
     if (!Render_Init(RENDERTYPE_2D_VECTOR, sdlWindow, true))
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Render_Init", "Failed to initialize render subsystem.", NULL);
 
+        Game_Quit();
+        Camera_Quit();
+        Input_Quit();
+
+        SDL_DestroyWindow(sdlWindow);
         SDL_Quit();
 
         return EXIT_FAILURE;
@@ -119,6 +168,11 @@ int main(int argc, char *argv[])
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "main", "Failed to create buffer for SDL events.", NULL);
 
         Render_Quit();
+        Game_Quit();
+        Camera_Quit();
+        Input_Quit();
+
+        SDL_DestroyWindow(sdlWindow);
         SDL_Quit();
 
         return EXIT_FAILURE;
@@ -199,10 +253,15 @@ int main(int argc, char *argv[])
     }
 
 
-    // Quit subsystems.
-    Render_Quit();
     List_Destroy(sdlEventBuffer, free);
 
+    // Quit subsystems.
+    Render_Quit();
+    Game_Quit();
+    Camera_Quit();
+    Input_Quit();
+
+    SDL_DestroyWindow(sdlWindow);
     SDL_Quit();
 
     return EXIT_SUCCESS;
