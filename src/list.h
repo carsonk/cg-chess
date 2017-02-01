@@ -50,6 +50,13 @@ bool List_GetLast(void *list, void **existingItem);
 size_t List_Count(void *list);
 
 
+void* List_IteratorCreate(void *list);
+void List_IteratorDestroy(void *iterator);
+
+bool List_IteratorHasNext(void *iterator);
+bool List_IteratorNext(void *iterator, void **existingItem);
+bool List_IteratorRemove(void *iterator, void **removedItem);
+
 #ifdef __cplusplus
 }
 #endif

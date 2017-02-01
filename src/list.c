@@ -82,6 +82,138 @@ static Node* GetNodeAt(List *linkedList, size_t index)
 }
 
 
+static bool RemoveFirstInternal(void *list, void **removedItem, void **lastNode)
+{
+    if (list == NULL)
+        return false;
+    if (removedItem == NULL)
+        return false;
+
+    List *linkedList = (List*)list;
+
+    if (linkedList->head == NULL)
+        return false;
+
+    Node *nodeToDelete = linkedList->head;
+    // New head might be NULL.
+    Node *newHead = nodeToDelete->next;
+
+    linkedList->head = newHead;
+
+    *removedItem = nodeToDelete->item;
+    free(nodeToDelete);
+
+    // List is now empty.
+    if (linkedList->head == NULL)
+        linkedList->tail = NULL;
+    // List is not empty. Adjust new head previous.
+    else
+        newHead->previous = NULL;
+
+    // Decrement the count.
+    linkedList->count--;
+
+    // Iterator support.
+    if (lastNode != NULL)
+        *lastNode = NULL;
+
+    return true;
+}
+
+
+static bool RemoveLastInternal(void *list, void **removedItem, void **lastNode)
+{
+    if (list == NULL)
+        return false;
+    if (removedItem == NULL)
+        return false;
+
+    List *linkedList = (List*)list;
+
+    if (linkedList->tail == NULL)
+        return false;
+
+    Node *nodeToDelete = linkedList->tail;
+    // New tail might be NULL.
+    Node *newTail = nodeToDelete->previous;
+
+    linkedList->tail = newTail;
+
+    *removedItem = nodeToDelete->item;
+    free(nodeToDelete);
+
+    // List is now empty.
+    if (linkedList->tail == NULL)
+    {
+        linkedList->head = NULL;
+
+        // Iterator support.
+        if (lastNode != NULL)
+            *lastNode = NULL;
+    }
+    // List is not empty. Adjust new head next.
+    else
+    {
+        newTail->next = NULL;
+
+        // Iterator support.
+        if (lastNode != NULL)
+            *lastNode = newTail;
+    }
+
+    // Decrement the count.
+    linkedList->count--;
+
+    return true;
+}
+
+
+static bool RemoveInternal(void *list, size_t index, void **removedItem, void **lastNode)
+{
+     if (list == NULL)
+        return false;
+    else if (removedItem == NULL)
+        return false;
+
+    List *linkedList = (List*)list;
+
+    size_t count = linkedList->count;
+
+    // Validate index.
+    if (index >= count)
+        return false;
+
+    // Remove head.
+    if (index == 0)
+        return RemoveFirstInternal(list, removedItem, lastNode);
+    // Remove tail.
+    else if (index == (count - 1))
+        return RemoveLastInternal(list, removedItem, lastNode);
+    // Remove any other node.
+    else
+    {
+        Node *centerNode = GetNodeAt(linkedList, index);
+        Node *leftNode = centerNode->previous;
+        Node *rightNode = centerNode->next;
+
+        *removedItem = centerNode->item;
+        free(centerNode);
+
+        leftNode->next = rightNode;
+        rightNode->previous = leftNode;
+
+        // Decrement the count.
+        linkedList->count--;
+
+        // Iterator support.
+        if (lastNode != NULL)
+            *lastNode = leftNode;
+
+        return true;
+    }
+}
+
+
 void* List_Create(void)
 {
     List *newList = malloc(sizeof(List));
@@ -291,113 +423,19 @@ bool List_AddLast(void *list, void *newItem)
 
 bool List_Remove(void *list, size_t index, void **removedItem)
 {
-     if (list == NULL)
-        return false;
-    else if (removedItem == NULL)
-        return false;
-
-    List *linkedList = (List*)list;
-
-    size_t count = linkedList->count;
-
-    // Validate index.
-    if (index >= count)
-        return false;
-
-    // Remove head.
-    if (index == 0)
-        return List_RemoveFirst(list, removedItem);
-    // Remove tail.
-    else if (index == (count - 1))
-        return List_RemoveLast(list, removedItem);
-    // Remove any other node.
-    else
-    {
-        Node *centerNode = GetNodeAt(linkedList, index);
-        Node *leftNode = centerNode->previous;
-        Node *rightNode = centerNode->next;
-
-        *removedItem = centerNode->item;
-        free(centerNode);
-
-        leftNode->next = rightNode;
-        rightNode->previous = leftNode;
-
-        // Decrement the count.
-        linkedList->count--;
-
-        return true;
-    }
+    return RemoveInternal(list, index, removedItem, NULL);
 }
 
 
 bool List_RemoveFirst(void *list, void **removedItem)
 {
-    if (list == NULL)
-        return false;
-    if (removedItem == NULL)
-        return false;
-
-    List *linkedList = (List*)list;
-
-    if (linkedList->head == NULL)
-        return false;
-
-    Node *nodeToDelete = linkedList->head;
-    // New head might be NULL.
-    Node *newHead = nodeToDelete->next;
-
-    linkedList->head = newHead;
-
-    *removedItem = nodeToDelete->item;
-    free(nodeToDelete);
-
-    // List is now empty.
-    if (linkedList->head == NULL)
-        linkedList->tail = NULL;
-    // List is not empty. Adjust new head previous.
-    else
-        newHead->previous = NULL;
-
-    // Decrement the count.
-    linkedList->count--;
-
-    return true;
+    return RemoveFirstInternal(list, removedItem, NULL);
 }
 
 
 bool List_RemoveLast(void *list, void **removedItem)
 {
-    if (list == NULL)
-        return false;
-    if (removedItem == NULL)
-        return false;
-
-    List *linkedList = (List*)list;
-
-    if (linkedList->tail == NULL)
-        return false;
-
-    Node *nodeToDelete = linkedList->tail;
-    // New tail might be NULL.
-    Node *newTail = nodeToDelete->previous;
-
-    linkedList->tail = newTail;
-
-    *removedItem = nodeToDelete->item;
-    free(nodeToDelete);
-
-    // List is now empty.
-    if (linkedList->tail == NULL)
-        linkedList->head = NULL;
-    // List is not empty. Adjust new head next.
-    else
-        newTail->next = NULL;
-
-    // Decrement the count.
-    linkedList->count--;
-
-    return true;
+    return RemoveLastInternal(list, removedItem, NULL);
 }
 
 
@@ -461,4 +499,141 @@ size_t List_Count(void *list)
         return 0;
     else
         return ((List*)list)->count;
+}
+
+
+
+
+typedef struct Iterator
+{
+    List *list;
+    bool nextIsHead;
+    size_t index;
+    bool canRemove;
+    Node *current;
+} Iterator;
+
+
+void* List_IteratorCreate(void *list)
+{
+    if (list == NULL)
+        return NULL;
+
+    Iterator *newIterator = malloc(sizeof(Iterator));
+
+    if (newIterator != NULL)
+    {
+        newIterator->list = (List*)list;
+        newIterator->nextIsHead = true;
+        newIterator->index = 0;
+        newIterator->canRemove = false;
+        newIterator->current = NULL;
+    }
+
+    return newIterator;
+}
+
+
+void List_IteratorDestroy(void *iterator)
+{
+    free(iterator);
+}
+
+
+bool List_IteratorHasNext(void *iterator)
+{
+    if (iterator == NULL)
+        return false;
+
+    Iterator *it = (Iterator*)iterator;
+
+    // Iterator has never had Next called on it.
+    // Check if the list head is not NULL.
+    // If it isn't NULL, we have got somewhere to go.
+    if (it->nextIsHead)
+        return it->list->head != NULL;
+    // Iterator is exhausted.
+    else if (it->current == NULL)
+        return false;
+    // Nowhere to go after this node.
+    else if (it->current->next == NULL)
+        return false;
+    // Still nodes available.
+    else
+        return true;
+}
+
+
+bool List_IteratorNext(void *iterator, void **existingItem)
+{
+    if (iterator == NULL)
+        return false;
+    else if (existingItem == NULL)
+        return false;
+
+    Iterator *it = (Iterator*)iterator;
+
+    // Jump to the list head.
+    if (it->nextIsHead)
+    {
+        it->nextIsHead = false;
+        it->current = it->list->head;
+    }
+    // Nowhere to jump to.
+    else if (it->current == NULL)
+        return false;
+    // Jump to the next node.
+    else
+    {
+        it->current = it->current->next;
+
+        // Increment the index.
+        it->index++;
+    }
+
+
+    // Jumped to a non-NULL node.
+    if (it->current != NULL)
+    {
+        it->canRemove = true;
+        *existingItem = it->current->item;
+        return true;
+    }
+    // Jumped to a NULL node.
+    else
+    {
+        it->canRemove = false;
+        return false;
+    }
+}
+
+
+bool List_IteratorRemove(void *iterator, void **removedItem)
+{
+    if (iterator == NULL)
+        return false;
+    else if (removedItem == NULL)
+        return false;
+
+    Iterator *it = (Iterator*)iterator;
+
+    // Check if we can remove the item.
+    if (!it->canRemove)
+        return false;
+
+    // Remove the item.
+    Node *lastNode;
+    if (!RemoveInternal((void*)it->list, it->index, removedItem, &lastNode))
+        return false;
+
+    // Point to the node before the removed node.
+    it->current = lastNode;
+    it->canRemove = false;
+
+    // Special conditions.
+    // List is empty, so next node is head.
+    if (lastNode == NULL)
+        it->nextIsHead = true;
+
+    return true;
 }

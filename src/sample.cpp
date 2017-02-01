@@ -111,34 +111,50 @@ void ProcessEvent(SDL_Event *sdlEvent)
 */
 void Sample_Logic(uint32_t currentTick)
 {
-    // "sdlEventBuffer" is made available by including "main.h"
-    // It is a list pointer owned by the game loop, so be careful with it.
+    // Iterate through the event buffer, processing events.
 
-    // Get the number of events stored in the list.
-    size_t numberOfEventsInList = List_Count(sdlEventBuffer);
+    // Create an iterator for the event buffer.
+    void *listIterator = List_IteratorCreate(sdlEventBuffer);
 
-    // Iterate through the list, going from the first to the last event.
-    // Do not consume (remove) events from the list when walking front-to-back.
-    // If you need to consume events from the list, walk the list back-to-front.
-    // Here, we are looking at all of the events but removing none of them.
-    for (size_t currentEventIndex = 0; currentEventIndex < numberOfEventsInList; currentEventIndex++)
+    // Pointer to stored event.
+    SDL_Event *currentEvent;
+    // While an event is available for processing.
+    while (List_IteratorHasNext(listIterator) == true)
     {
-        // Pointer to stored event.
-        SDL_Event *currentEvent;
-
-        // Retrieve the event at the specified index.
-        if (List_Get(sdlEventBuffer, currentEventIndex, (void**)&currentEvent) == false)
-        {
-            // Failed to get an event from the specified index.
-            // Something is seriously wrong here.
-            // The list may be corrupted.
-            break;
-        }
+        // Get the next event, storing its location into the currentEvent pointer.
+        if (List_IteratorNext(listIterator, (void**)&currentEvent) == false)
+            break; // Serious error. Corruption of list or iterator has occurred.
         else
+            ProcessEvent(currentEvent); // Process the event.
+
+        // For example, consume keydown events.
+        // Remember that this is a global event buffer.
+        // If events are consumed here, no input functions hereafter will see the consumed events.
+
+        // Iterator makes it safe to remove the current item from the list.
+        if (currentEvent->type == SDL_KEYDOWN)
         {
-            // Retrieved the event from the specified index successfully.
-            // Let's analyze it.
-            ProcessEvent(currentEvent);
+            // When an item is removed from the list, it must be freed manually.
+            // The list has no knowledge of the allocation / freeing methods used for the items it contains.
+            // malloc() was used to allocate these items, so free() should be used to free them.
+
+            // If an item is removed but not freed, a memory leak will occur.
+
+            void *removedItem;
+
+            // Note that removedItem and currentEvent will point to the same data.
+            // Once free(removedItem) is called, currentEvent will point to garbage data.
+            // currentEvent cannot be dereferenced after this removal.
+
+            if (List_IteratorRemove(listIterator, &removedItem) == false)
+                break; // Serious error. Corruption of list or iterator has occurred.
+            else
+                free(removedItem); // Free the item, now that it has been removed from the list.
+
+            printf("Sample_Logic: Consumed keydown event in global buffer.\n");
         }
     }
+
+    // Destroy the event buffer iterator.
+    List_IteratorDestroy(listIterator);
 }
