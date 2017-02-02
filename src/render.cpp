@@ -21,131 +21,39 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include "main.h"
 #include "render.h"
 #include "SDL.h"
 
-#define FIRST_AVAILABLE_DEVICE -1
+// Must include Windows header prior to including OpenGL header.
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+#include <gl/GL.h>
+#include <gl/GLU.h>
 
-static bool isInitialized;
-static RenderType currentRenderType;
-static SDL_Renderer *sdlRenderer;
 
-
-static void Init2DVector(void)
+bool Render_Init(bool vSync)
 {
-    SDL_RenderSetLogicalSize(sdlRenderer, 640, 480);
-}
-
-
-static void Render2DVector(uint32_t currentTick, double interpolation)
-{
-    SDL_SetRenderDrawColor(sdlRenderer, 0, 0, 0, 0);
-    SDL_RenderClear(sdlRenderer);
-
-    SDL_SetRenderDrawColor(sdlRenderer, 255, 255, 255, 255);
-    SDL_RenderDrawLine(sdlRenderer, 0, 0, 639, 479);
-    SDL_RenderDrawLine(sdlRenderer, 639, 0, 0, 479);
-
-    SDL_RenderPresent(sdlRenderer);
-}
-
-
-bool Render_Init(RenderType renderType, SDL_Window *sdlWindow, bool vSync)
-{
-    // Never initialize twice.
-    assert(!isInitialized);
-
-    // No renderer.
-    if (renderType == RENDERTYPE_NONE)
+    if (vSync)
     {
-        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Render_Init: Initialized successfully with RENDERTYPE_NONE.");
-        isInitialized = true;
-        currentRenderType = renderType;
-        return true;
+        if (SDL_GL_SetSwapInterval(1) != 0)
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "SDL_GL_SetSwapInterval: %s", SDL_GetError());
     }
-    // Use SDL's renderer for basic 2D graphics.
-    else if (renderType == RENDERTYPE_2D_VECTOR)
-    {
-        // Must associate SDL renderer with SDL window.
-        assert(sdlWindow != NULL);
 
-        uint32_t renderFlags = 0;
-        renderFlags |= (vSync ? SDL_RENDERER_PRESENTVSYNC : 0);
-
-        sdlRenderer = SDL_CreateRenderer(sdlWindow, FIRST_AVAILABLE_DEVICE, renderFlags);
-
-        if (sdlRenderer == NULL)
-        {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Render_Init: Failed to create SDL renderer.");
-            return false;
-        }
-
-        // If vertical synchronization was requested, check that we got it.
-        if (vSync)
-        {
-            SDL_RendererInfo sdlRendererInfo;
-            if (SDL_GetRendererInfo(sdlRenderer, &sdlRendererInfo) != 0)
-            {
-                SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "SDL_GetRendererInfo: %s", SDL_GetError());
-            }
-            else
-            {
-                if ((sdlRendererInfo.flags & SDL_RENDERER_PRESENTVSYNC) != SDL_RENDERER_PRESENTVSYNC)
-                {
-                    SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateRenderer: VSync was requested, but was unavailable.");
-                }
-                else
-                {
-                    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateRenderer: VSync is enabled.");
-                }
-            }
-        }
-
-        Init2DVector();
-
-        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Render_Init: Initialized successfully with RENDERTYPE_2D_VECTOR.");
-        isInitialized = true;
-        currentRenderType = renderType;
-        return true;
-    }
-    else
-    {
-        assert(false);
-        return false;
-    }
+    return true;
 }
 
 
 void Render_Quit(void)
 {
-    // Must be initialized already.
-    assert(isInitialized);
-
-    if (currentRenderType == RENDERTYPE_NONE)
-    {
-        isInitialized = false;
-    }
-    else if (currentRenderType == RENDERTYPE_2D_VECTOR)
-    {
-        SDL_DestroyRenderer(sdlRenderer);
-        sdlRenderer = NULL;
-        isInitialized = false;
-    }
 }
 
 
 void Render_Draw(uint32_t currentTick, double interpolation)
 {
-    assert(isInitialized);
+    glClearColor(0, 0, 0, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-    switch (currentRenderType)
-    {
-        case RENDERTYPE_NONE:
-            break;
-        case RENDERTYPE_2D_VECTOR:
-            Render2DVector(currentTick, interpolation);
-            break;
-        default:
-            break;
-    }
+    SDL_GL_SwapWindow(sdlWindow);
 }

@@ -33,17 +33,17 @@
 
 
 #define WINDOW_TITLE "cg-chess"
-#define WINDOW_DEFAULT_WIDTH (640)
-#define WINDOW_DEFAULT_HEIGHT (480)
+#define WINDOW_DEFAULT_WIDTH (512)
+#define WINDOW_DEFAULT_HEIGHT (512)
 
 #define TICKS_PER_SECOND (60)
 #define MS_PER_TICK (1000 / TICKS_PER_SECOND)
 
-#define MAX_FRAMESKIP (TICKS_PER_SECOND / 4)
-
 
 bool isRunning;
 void *sdlEventBuffer;
+SDL_Window *sdlWindow;
+SDL_GLContext sdlGLContext;
 
 
 static void DoInput(uint32_t currentTick)
@@ -96,13 +96,24 @@ int main(int argc, char *argv[])
     }
 
     // Create an SDL window.
-    SDL_Window *sdlWindow = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                                            WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT, 0);
+    sdlWindow = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                                WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     // Check if window was created successfully.
     if (sdlWindow == NULL)
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL_CreateWindow", SDL_GetError(), NULL);
+
+        SDL_Quit();
+
+        return EXIT_FAILURE;
+    }
+
+    // Create an OpenGL context.
+    sdlGLContext = SDL_GL_CreateContext(sdlWindow);
+    if (sdlGLContext == NULL)
+    {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL_GL_CreateContext", SDL_GetError(), NULL);
 
         SDL_Quit();
 
@@ -117,6 +128,7 @@ int main(int argc, char *argv[])
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Input_Init", "Failed to initialize input subsystem.", NULL);
 
+        SDL_GL_DeleteContext(sdlGLContext);
         SDL_DestroyWindow(sdlWindow);
         SDL_Quit();
 
@@ -130,6 +142,7 @@ int main(int argc, char *argv[])
 
         Input_Quit();
 
+        SDL_GL_DeleteContext(sdlGLContext);
         SDL_DestroyWindow(sdlWindow);
         SDL_Quit();
 
@@ -144,6 +157,7 @@ int main(int argc, char *argv[])
         Camera_Quit();
         Input_Quit();
 
+        SDL_GL_DeleteContext(sdlGLContext);
         SDL_DestroyWindow(sdlWindow);
         SDL_Quit();
 
@@ -151,7 +165,7 @@ int main(int argc, char *argv[])
     }
 
     // Render Subsystem
-    if (!Render_Init(RENDERTYPE_2D_VECTOR, sdlWindow, true))
+    if (!Render_Init(true))
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Render_Init", "Failed to initialize render subsystem.", NULL);
 
@@ -159,6 +173,7 @@ int main(int argc, char *argv[])
         Camera_Quit();
         Input_Quit();
 
+        SDL_GL_DeleteContext(sdlGLContext);
         SDL_DestroyWindow(sdlWindow);
         SDL_Quit();
 
@@ -176,6 +191,7 @@ int main(int argc, char *argv[])
         Camera_Quit();
         Input_Quit();
 
+        SDL_GL_DeleteContext(sdlGLContext);
         SDL_DestroyWindow(sdlWindow);
         SDL_Quit();
 
@@ -197,7 +213,6 @@ int main(int argc, char *argv[])
     uint32_t laggedTime = 0;
     uint32_t currentTick = 0;
     uint32_t currentFrame = 0;
-    uint32_t currentFrameskip = 0;
     isRunning = true;
     while (isRunning)
     {
@@ -222,19 +237,12 @@ int main(int argc, char *argv[])
         DoInput(currentTick);
 
 
-        currentFrameskip = 0;
-        while ((laggedTime >= MS_PER_TICK) && currentFrameskip < MAX_FRAMESKIP)
+        while (laggedTime >= MS_PER_TICK)
         {
             // Core Logic Function
             DoLogic(currentTick);
 
             currentTick++;
-            currentFrameskip++;
-
-            if (currentFrameskip == MAX_FRAMESKIP)
-            {
-                SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Maximum frameskip reached: %" PRIu32 " frames", currentFrameskip);
-            }
 
             laggedTime -= MS_PER_TICK;
         }
@@ -265,6 +273,7 @@ int main(int argc, char *argv[])
     Camera_Quit();
     Input_Quit();
 
+    SDL_GL_DeleteContext(sdlGLContext);
     SDL_DestroyWindow(sdlWindow);
     SDL_Quit();
 

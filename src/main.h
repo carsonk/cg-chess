@@ -21,10 +21,16 @@
 #pragma once
 
 #include <stdbool.h>
-#include "common.h"
+#include "SDL.h"
 
 // Globally accessible boolean that determines whether the game loop should continue.
 extern bool isRunning;
 
 // Globally accessible list that stores all SDL events for later processing in the game logic.
 extern void *sdlEventBuffer;
+
+// Globally accessible SDL window that represents the game window.
+extern SDL_Window *sdlWindow;
+
+// Globally accessible OpenGL context that represents the game OpenGL context.
+extern SDL_GLContext sdlGLContext;
