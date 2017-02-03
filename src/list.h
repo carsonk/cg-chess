@@ -53,7 +53,6 @@ size_t List_Count(void *list);
 void* List_IteratorCreate(void *list);
 void List_IteratorDestroy(void *iterator);
 
-bool List_IteratorHasNext(void *iterator);
 bool List_IteratorNext(void *iterator, void **existingItem);
 bool List_IteratorRemove(void *iterator, void **removedItem);
 

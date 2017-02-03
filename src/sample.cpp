@@ -118,14 +118,11 @@ void Sample_Logic(uint32_t currentTick)
 
     // Pointer to stored event.
     SDL_Event *currentEvent;
-    // While an event is available for processing.
-    while (List_IteratorHasNext(listIterator) == true)
+    // Get the next event, storing its location into the currentEvent pointer.
+    // If List_IteratorNext() returns false, no more events are available.
+    while (List_IteratorNext(listIterator, (void**)&currentEvent))
     {
-        // Get the next event, storing its location into the currentEvent pointer.
-        if (List_IteratorNext(listIterator, (void**)&currentEvent) == false)
-            break; // Serious error. Corruption of list or iterator has occurred.
-        else
-            ProcessEvent(currentEvent); // Process the event.
+        ProcessEvent(currentEvent); // Process the event.
 
         // For example, consume keydown events.
         // Remember that this is a global event buffer.
@@ -146,7 +143,8 @@ void Sample_Logic(uint32_t currentTick)
             // Once free(removedItem) is called, currentEvent will point to garbage data.
             // currentEvent cannot be dereferenced after this removal.
 
-            if (List_IteratorRemove(listIterator, &removedItem) == false)
+            // If List_IteratorRemove() returns false, it failed to remove the item from the list.
+            if (!List_IteratorRemove(listIterator, &removedItem))
                 break; // Serious error. Corruption of list or iterator has occurred.
             else
                 free(removedItem); // Free the item, now that it has been removed from the list.

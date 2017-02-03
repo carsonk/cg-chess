@@ -540,30 +540,6 @@ void List_IteratorDestroy(void *iterator)
 }
 
 
-bool List_IteratorHasNext(void *iterator)
-{
-    if (iterator == NULL)
-        return false;
-
-    Iterator *it = (Iterator*)iterator;
-
-    // Iterator has never had Next called on it.
-    // Check if the list head is not NULL.
-    // If it isn't NULL, we have got somewhere to go.
-    if (it->nextIsHead)
-        return it->list->head != NULL;
-    // Iterator is exhausted.
-    else if (it->current == NULL)
-        return false;
-    // Nowhere to go after this node.
-    else if (it->current->next == NULL)
-        return false;
-    // Still nodes available.
-    else
-        return true;
-}
-
-
 bool List_IteratorNext(void *iterator, void **existingItem)
 {
     if (iterator == NULL)
