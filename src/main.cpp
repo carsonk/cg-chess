@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include "asset.h"
 #include "camera.h"
 #include "game.h"
 #include "input.h"
@@ -88,7 +89,7 @@ static void DoRender(uint32_t currentTick, double interpolation)
 int main(int argc, char *argv[])
 {
     // Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL_Init", SDL_GetError(), NULL);
 
@@ -123,10 +124,24 @@ int main(int argc, char *argv[])
 
     // Initialize subsystems.
 
+    // Asset Subsystem
+    if (!Asset_Init())
+    {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Asset_Init", "Failed to initialize asset subsystem.", NULL);
+
+        SDL_GL_DeleteContext(sdlGLContext);
+        SDL_DestroyWindow(sdlWindow);
+        SDL_Quit();
+
+        return EXIT_FAILURE;
+    }
+
     // Input Subsystem
     if (!Input_Init())
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Input_Init", "Failed to initialize input subsystem.", NULL);
+
+        Asset_Quit();
 
         SDL_GL_DeleteContext(sdlGLContext);
         SDL_DestroyWindow(sdlWindow);
@@ -141,6 +156,7 @@ int main(int argc, char *argv[])
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Camera_Init", "Failed to initialize camera subsystem.", NULL);
 
         Input_Quit();
+        Asset_Quit();
 
         SDL_GL_DeleteContext(sdlGLContext);
         SDL_DestroyWindow(sdlWindow);
@@ -156,6 +172,7 @@ int main(int argc, char *argv[])
 
         Camera_Quit();
         Input_Quit();
+        Asset_Quit();
 
         SDL_GL_DeleteContext(sdlGLContext);
         SDL_DestroyWindow(sdlWindow);
@@ -172,6 +189,7 @@ int main(int argc, char *argv[])
         Game_Quit();
         Camera_Quit();
         Input_Quit();
+        Asset_Quit();
 
         SDL_GL_DeleteContext(sdlGLContext);
         SDL_DestroyWindow(sdlWindow);
@@ -190,6 +208,7 @@ int main(int argc, char *argv[])
         Game_Quit();
         Camera_Quit();
         Input_Quit();
+        Asset_Quit();
 
         SDL_GL_DeleteContext(sdlGLContext);
         SDL_DestroyWindow(sdlWindow);
@@ -272,6 +291,7 @@ int main(int argc, char *argv[])
     Game_Quit();
     Camera_Quit();
     Input_Quit();
+    Asset_Quit();
 
     SDL_GL_DeleteContext(sdlGLContext);
     SDL_DestroyWindow(sdlWindow);
