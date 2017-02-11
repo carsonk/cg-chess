@@ -100,7 +100,6 @@ int main(int argc, char *argv[])
     // Create an SDL window.
     sdlWindow = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                 WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-
     // Check if window was created successfully.
     if (sdlWindow == NULL)
     {
@@ -231,7 +230,8 @@ int main(int argc, char *argv[])
     retCode = EXIT_SUCCESS;
 
 cleanup:
-    List_Destroy(sdlEventBuffer, free);
+    if (sdlEventBuffer)
+        List_Destroy(sdlEventBuffer, free);
 
     // Quit subsystems.
     Render_Quit();
@@ -240,8 +240,12 @@ cleanup:
     Input_Quit();
     Asset_Quit();
 
-    SDL_GL_DeleteContext(sdlGLContext);
-    SDL_DestroyWindow(sdlWindow);
+    if (sdlGLContext)
+        SDL_GL_DeleteContext(sdlGLContext);
+
+    if (sdlWindow)
+        SDL_DestroyWindow(sdlWindow);
+
     SDL_Quit();
 
     return retCode;
