@@ -41,9 +41,9 @@
 #define MS_PER_TICK (1000 / TICKS_PER_SECOND)
 
 
-bool isRunning;
-void *sdlEventBuffer;
-SDL_Window *sdlWindow;
+bool isRunning = false;
+void *sdlEventBuffer = NULL;
+SDL_Window *sdlWindow = NULL;
 SDL_GLContext sdlGLContext;
 
 
@@ -88,11 +88,12 @@ static void DoRender(uint32_t currentTick, double interpolation)
 
 int main(int argc, char *argv[])
 {
+    int retCode = EXIT_FAILURE;
+
     // Initialize SDL
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL_Init", SDL_GetError(), NULL);
-
         return EXIT_FAILURE;
     }
 
@@ -104,10 +105,7 @@ int main(int argc, char *argv[])
     if (sdlWindow == NULL)
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL_CreateWindow", SDL_GetError(), NULL);
-
-        SDL_Quit();
-
-        return EXIT_FAILURE;
+        goto cleanup;
     }
 
     // Create an OpenGL context.
@@ -115,10 +113,7 @@ int main(int argc, char *argv[])
     if (sdlGLContext == NULL)
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL_GL_CreateContext", SDL_GetError(), NULL);
-
-        SDL_Quit();
-
-        return EXIT_FAILURE;
+        goto cleanup;
     }
 
 
@@ -128,74 +123,35 @@ int main(int argc, char *argv[])
     if (!Asset_Init())
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Asset_Init", "Failed to initialize asset subsystem.", NULL);
-
-        SDL_GL_DeleteContext(sdlGLContext);
-        SDL_DestroyWindow(sdlWindow);
-        SDL_Quit();
-
-        return EXIT_FAILURE;
+        goto cleanup;
     }
 
     // Input Subsystem
     if (!Input_Init())
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Input_Init", "Failed to initialize input subsystem.", NULL);
-
-        Asset_Quit();
-
-        SDL_GL_DeleteContext(sdlGLContext);
-        SDL_DestroyWindow(sdlWindow);
-        SDL_Quit();
-
-        return EXIT_FAILURE;
+        goto cleanup;
     }
 
     // Camera Subsystem
     if (!Camera_Init())
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Camera_Init", "Failed to initialize camera subsystem.", NULL);
-
-        Input_Quit();
-        Asset_Quit();
-
-        SDL_GL_DeleteContext(sdlGLContext);
-        SDL_DestroyWindow(sdlWindow);
-        SDL_Quit();
-
-        return EXIT_FAILURE;
+        goto cleanup;
     }
 
     // Game Subsystem
     if (!Game_Init())
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Game_Init", "Failed to initialize game subsystem.", NULL);
-
-        Camera_Quit();
-        Input_Quit();
-        Asset_Quit();
-
-        SDL_GL_DeleteContext(sdlGLContext);
-        SDL_DestroyWindow(sdlWindow);
-        SDL_Quit();
-
-        return EXIT_FAILURE;
+        goto cleanup;
     }
 
     // Render Subsystem
     if (!Render_Init(true))
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Render_Init", "Failed to initialize render subsystem.", NULL);
-
-        Game_Quit();
-        Camera_Quit();
-        Input_Quit();
-        Asset_Quit();
-
-        SDL_GL_DeleteContext(sdlGLContext);
-        SDL_DestroyWindow(sdlWindow);
-        SDL_Quit();
-
-        return EXIT_FAILURE;
+        goto cleanup;
     }
 
     // Allocate SDL event buffer.
@@ -203,18 +159,7 @@ int main(int argc, char *argv[])
     if (sdlEventBuffer == NULL)
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "main", "Failed to create buffer for SDL events.", NULL);
-
-        Render_Quit();
-        Game_Quit();
-        Camera_Quit();
-        Input_Quit();
-        Asset_Quit();
-
-        SDL_GL_DeleteContext(sdlGLContext);
-        SDL_DestroyWindow(sdlWindow);
-        SDL_Quit();
-
-        return EXIT_FAILURE;
+        goto cleanup;
     }
 
 
@@ -283,7 +228,9 @@ int main(int argc, char *argv[])
         }
     }
 
+    retCode = EXIT_SUCCESS;
 
+cleanup:
     List_Destroy(sdlEventBuffer, free);
 
     // Quit subsystems.
@@ -297,5 +244,5 @@ int main(int argc, char *argv[])
     SDL_DestroyWindow(sdlWindow);
     SDL_Quit();
 
-    return EXIT_SUCCESS;
+    return retCode;
 }
