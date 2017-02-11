@@ -20,16 +20,28 @@
 
 #include "game.h"
 
+#include "Stockfish\src\position.h"
+#include "Stockfish\src\types.h"
+
+Position currentPosition;
+StateListPtr States(new std::deque<StateInfo>(1));
+
+// Opening game state.
+const char* startFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 bool Game_Init(void)
 {
+    Position::init();
+
+    currentPosition.set(startFEN, false, &States->back(), nullptr);
+
     return true;
 }
 
 
 void Game_Logic(uint32_t currentTick)
 {
-
+    Move moveAttempt;
 }
 
 
