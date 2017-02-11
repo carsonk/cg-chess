@@ -20,8 +20,13 @@
 
 #include "game.h"
 
+#include "Stockfish\src\bitboard.h"
 #include "Stockfish\src\position.h"
-#include "Stockfish\src\types.h"
+#include "Stockfish\src\search.h"
+#include "Stockfish\src\thread.h"
+#include "Stockfish\src\tt.h"
+#include "Stockfish\src\uci.h"
+#include "Stockfish\src\syzygy\tbprobe.h"
 
 Position currentPosition;
 StateListPtr States(new std::deque<StateInfo>(1));
@@ -31,9 +36,16 @@ const char* startFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 
 bool Game_Init(void)
 {
+    UCI::init(Options);
+    Bitboards::init();
     Position::init();
+    Bitbases::init();
+    Search::init();
+    Pawns::init();
+    Threads.init();
+    Tablebases::init(Options["SyzygyPath"]);
 
-    currentPosition.set(startFEN, false, &States->back(), nullptr);
+    currentPosition.set(startFEN, false, &States->back(), Threads.main());
 
     return true;
 }
