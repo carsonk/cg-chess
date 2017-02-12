@@ -71,25 +71,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)..\lib\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\lib\SDL2-2.0.5\include;$(SolutionDir)..\lib\glm-0.9.8.4;$(SolutionDir)..\lib\nanosvg;$(SolutionDir)..\lib\tinyobjloader</IncludePath>
     <LibraryPath>$(SolutionDir)..\lib\SDL2-2.0.5\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)..\lib\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\lib\SDL2-2.0.5\include;$(SolutionDir)..\lib\glm-0.9.8.4;$(SolutionDir)..\lib\nanosvg;$(SolutionDir)..\lib\tinyobjloader</IncludePath>
     <LibraryPath>$(SolutionDir)..\lib\SDL2-2.0.5\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)..\lib\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\lib\SDL2-2.0.5\include;$(SolutionDir)..\lib\glm-0.9.8.4;$(SolutionDir)..\lib\nanosvg;$(SolutionDir)..\lib\tinyobjloader</IncludePath>
     <LibraryPath>$(SolutionDir)..\lib\SDL2-2.0.5\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)..\lib\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\lib\SDL2-2.0.5\include;$(SolutionDir)..\lib\glm-0.9.8.4;$(SolutionDir)..\lib\nanosvg;$(SolutionDir)..\lib\tinyobjloader</IncludePath>
     <LibraryPath>$(SolutionDir)..\lib\SDL2-2.0.5\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
