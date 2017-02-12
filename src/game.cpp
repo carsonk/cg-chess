@@ -32,7 +32,7 @@ Position currentPosition;
 StateListPtr States(new std::deque<StateInfo>(1));
 
 // Opening game state.
-const char* startFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+const char *startFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 bool Game_Init(void)
 {
