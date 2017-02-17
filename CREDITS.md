@@ -18,3 +18,7 @@
 - tinyobjloader
     - License: MIT
     - Link: [Tiny obj loader by syoyo](http://syoyo.github.io/tinyobjloader/)
+
+# Third-Party Tools
+- Wings 3D
+    - Link: [Wings 3D | A Polygon Modeler](http://www.wings3d.com/)
