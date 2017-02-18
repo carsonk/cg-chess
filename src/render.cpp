@@ -103,19 +103,7 @@ void Render_Logic(uint32_t currentTick)
 
     SDL_Event *currentEvent;
     while (List_IteratorNext(listIterator, (void**)&currentEvent))
-    {
         ProcessEvent(currentEvent);
-
-        if (currentEvent->type == SDL_KEYDOWN)
-        {
-            void *removedItem;
-
-            if (!List_IteratorRemove(listIterator, &removedItem))
-                break;
-            else
-                free(removedItem);
-        }
-    }
 }
 
 
