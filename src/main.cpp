@@ -76,6 +76,8 @@ static void DoLogic(uint32_t currentTick)
     Input_Logic(currentTick);
     Game_Logic(currentTick);
 
+    Render_Logic(currentTick);
+
     List_Clear(sdlEventBuffer, free);
 }
 

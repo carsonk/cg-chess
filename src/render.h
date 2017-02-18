@@ -31,6 +31,7 @@ typedef enum RenderType
 } RenderType;
 
 bool Render_Init(bool vSync);
+void Render_Logic(uint32_t currentTick);
 void Render_Quit(void);
 
 void Render_Draw(uint32_t currentTick, double interpolation);
