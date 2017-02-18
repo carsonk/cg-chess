@@ -71,26 +71,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)..\lib\SDL2-2.0.5\include;$(SolutionDir)..\lib\glm-0.9.8.4;$(SolutionDir)..\lib\nanosvg;$(SolutionDir)..\lib\tinyobjloader;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\SDL2-2.0.5\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\lib\SDL2-2.0.5\include;$(SolutionDir)..\lib\glm-0.9.8.4;$(SolutionDir)..\lib\nanosvg;$(SolutionDir)..\lib\tinyobjloader;$(SolutionDir)..\lib\ZipLib\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\SDL2-2.0.5\lib\x64;$(SolutionDir)..\lib\ZipLib\lib\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)..\lib\SDL2-2.0.5\include;$(SolutionDir)..\lib\glm-0.9.8.4;$(SolutionDir)..\lib\nanosvg;$(SolutionDir)..\lib\tinyobjloader;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\SDL2-2.0.5\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\lib\SDL2-2.0.5\include;$(SolutionDir)..\lib\glm-0.9.8.4;$(SolutionDir)..\lib\nanosvg;$(SolutionDir)..\lib\tinyobjloader;$(SolutionDir)..\lib\ZipLib\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\SDL2-2.0.5\lib\x86;$(SolutionDir)..\lib\ZipLib\lib\x86\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)..\lib\SDL2-2.0.5\include;$(SolutionDir)..\lib\glm-0.9.8.4;$(SolutionDir)..\lib\nanosvg;$(SolutionDir)..\lib\tinyobjloader;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\SDL2-2.0.5\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\lib\SDL2-2.0.5\include;$(SolutionDir)..\lib\glm-0.9.8.4;$(SolutionDir)..\lib\nanosvg;$(SolutionDir)..\lib\tinyobjloader;$(SolutionDir)..\lib\ZipLib\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\SDL2-2.0.5\lib\x86;$(SolutionDir)..\lib\ZipLib\lib\x86\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)..\lib\SDL2-2.0.5\include;$(SolutionDir)..\lib\glm-0.9.8.4;$(SolutionDir)..\lib\nanosvg;$(SolutionDir)..\lib\tinyobjloader;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\SDL2-2.0.5\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\lib\SDL2-2.0.5\include;$(SolutionDir)..\lib\glm-0.9.8.4;$(SolutionDir)..\lib\nanosvg;$(SolutionDir)..\lib\tinyobjloader;$(SolutionDir)..\lib\ZipLib\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\SDL2-2.0.5\lib\x64;$(SolutionDir)..\lib\ZipLib\lib\x64\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -100,7 +100,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OutputPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Stockfish.lib;glu32.lib;OpenGL32.lib;SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>bzip2.lib;lzma.lib;zlib.lib;ZipLib.lib;Stockfish.lib;glu32.lib;OpenGL32.lib;SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
@@ -115,7 +115,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OutputPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Stockfish.lib;glu32.lib;OpenGL32.lib;SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>bzip2.lib;lzma.lib;zlib.lib;ZipLib.lib;Stockfish.lib;glu32.lib;OpenGL32.lib;SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
@@ -134,7 +134,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(OutputPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Stockfish.lib;glu32.lib;OpenGL32.lib;SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>bzip2.lib;lzma.lib;zlib.lib;ZipLib.lib;Stockfish.lib;glu32.lib;OpenGL32.lib;SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
@@ -154,7 +154,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(OutputPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>Stockfish.lib;glu32.lib;OpenGL32.lib;SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>bzip2.lib;lzma.lib;zlib.lib;ZipLib.lib;Stockfish.lib;glu32.lib;OpenGL32.lib;SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>python  "$(SolutionDir)..\scripts\postbuild.py" $(SolutionDir)..\ 64 $(SolutionDir)..\bin\$(Platform)\$(Configuration)\</Command>
@@ -171,7 +171,6 @@
     <ClCompile Include="..\..\src\render.cpp" />
     <ClCompile Include="..\..\src\sample.cpp" />
     <ClCompile Include="..\..\src\util.cpp" />
-    <ClCompile Include="..\..\src\vectorart.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\asset.h" />
@@ -185,7 +184,6 @@
     <ClInclude Include="..\..\src\render.h" />
     <ClInclude Include="..\..\src\sample.h" />
     <ClInclude Include="..\..\src\util.h" />
-    <ClInclude Include="..\..\src\vectorart.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\.gitignore" />

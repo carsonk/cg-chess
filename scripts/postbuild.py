@@ -22,10 +22,13 @@ def build_assets():
         os.mkdir('./tmp')
 
     asset_package = zipfile.ZipFile('./tmp/assets', mode='w', compression=zipfile.ZIP_DEFLATED)
+    file_list = open('./tmp/assetfiles.txt', 'wt')
+
     os.chdir(asset_dir)
     asset_files = glob.glob('**', recursive=True)
     for filename in asset_files:
         asset_package.write(filename)
+        file_list.write('"' + filename + '"\n')
     asset_package.close()
 
     os.chdir(current_dir)

@@ -18,6 +18,9 @@
 - tinyobjloader
     - License: MIT
     - Link: [Tiny obj loader by syoyo](http://syoyo.github.io/tinyobjloader/)
+- ZipLib
+    - License: zlib
+    - Link: [Bitbucket](https://bitbucket.org/wbenny/ziplib)
 
 # Third-Party Tools
 - Wings 3D
