@@ -40,6 +40,16 @@
 #define PIECE_SVG_KING_LIGHT "svg/Chess_klt45.svg"
 
 
+#define PIECE_OBJ_PAWN "obj/pawn.obj"
+#define PIECE_OBJ_ROOK "obj/rook.obj"
+#define PIECE_OBJ_KNIGHT "obj/knight.obj"
+#define PIECE_OBJ_BISHOP "obj/bishop.obj"
+#define PIECE_OBJ_QUEEN "obj/queen.obj"
+#define PIECE_OBJ_KING "obj/king.obj"
+
+#define PIECE_OBJ_BOARD "obj/board.obj"
+#define PIECE_MTL_BOARD "mtl/board.mtl"
+
 const char *svgPawnDark;
 const char *svgRookDark;
 const char *svgKnightDark;
