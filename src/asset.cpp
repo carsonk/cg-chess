@@ -24,6 +24,9 @@
 #include "SDL.h"
 #include "ZipFile.h"
 
+#define NANOSVG_IMPLEMENTATION
+#include "nanosvg.h"
+
 
 #define PIECE_SVG_PAWN_DARK "svg/Chess_pdt45.svg"
 #define PIECE_SVG_ROOK_DARK "svg/Chess_rdt45.svg"
@@ -50,22 +53,22 @@
 #define PIECE_OBJ_BOARD "obj/board.obj"
 #define PIECE_MTL_BOARD "mtl/board.mtl"
 
-const char *svgPawnDark;
-const char *svgRookDark;
-const char *svgKnightDark;
-const char *svgBishopDark;
-const char *svgQueenDark;
-const char *svgKingDark;
+struct NSVGimage *svgPawnDark;
+struct NSVGimage *svgRookDark;
+struct NSVGimage *svgKnightDark;
+struct NSVGimage *svgBishopDark;
+struct NSVGimage *svgQueenDark;
+struct NSVGimage *svgKingDark;
 
-const char *svgPawnLight;
-const char *svgRookLight;
-const char *svgKnightLight;
-const char *svgBishopLight;
-const char *svgQueenLight;
-const char *svgKingLight;
+struct NSVGimage *svgPawnLight;
+struct NSVGimage *svgRookLight;
+struct NSVGimage *svgKnightLight;
+struct NSVGimage *svgBishopLight;
+struct NSVGimage *svgQueenLight;
+struct NSVGimage *svgKingLight;
 
 
-void ReadLinesAndCopy(std::shared_ptr<ZipArchiveEntry> archiveEntry, const char *destination)
+void ReadLinesAndCopy(std::shared_ptr<ZipArchiveEntry> archiveEntry, char **destination)
 {
     // http://stackoverflow.com/questions/3203452/how-to-read-entire-stream-into-a-stdstring
     std::istream *decompressionStream = archiveEntry->GetDecompressionStream();
@@ -75,74 +78,101 @@ void ReadLinesAndCopy(std::shared_ptr<ZipArchiveEntry> archiveEntry, const char 
     char *copiedString = new char[allLines.length() + 1];
     strcpy_s(copiedString, allLines.length() + 1, allLines.c_str());
 
-    destination = copiedString;
+    *destination = copiedString;
 }
 
 
 // Asset_Quit() should free copied strings.
 bool LoadSVGAssets(std::shared_ptr<ZipArchive> archive)
 {
+    char *currentText = NULL;
+
     // Dark Pieces
     ZipArchiveEntry::Ptr archiveEntry = archive->GetEntry(PIECE_SVG_PAWN_DARK);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgPawnDark);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgPawnDark = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_ROOK_DARK);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgRookDark);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgRookDark = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_KNIGHT_DARK);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgKnightDark);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgKnightDark = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_BISHOP_DARK);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgBishopDark);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgBishopDark = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_QUEEN_DARK);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgQueenDark);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgQueenDark = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_KING_DARK);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgKingDark);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgKingDark = nsvgParse(currentText, "px", 96);
+    delete(currentText);
+
 
     // Light Pieces
     archiveEntry = archive->GetEntry(PIECE_SVG_PAWN_LIGHT);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgPawnLight);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgPawnLight = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_ROOK_LIGHT);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgRookLight);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgRookLight = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_KNIGHT_LIGHT);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgKnightLight);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgKnightLight = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_BISHOP_LIGHT);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgBishopLight);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgBishopLight = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_QUEEN_LIGHT);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgQueenLight);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgQueenLight = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_KING_LIGHT);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgQueenLight);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgKingLight = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     return true;
 }
@@ -165,17 +195,17 @@ bool Asset_Init(void)
 
 void Asset_Quit(void)
 {
-    delete(svgPawnDark);
-    delete(svgRookDark);
-    delete(svgKnightDark);
-    delete(svgBishopDark);
-    delete(svgQueenDark);
-    delete(svgKingDark);
+    nsvgDelete(svgPawnDark);
+    nsvgDelete(svgRookDark);
+    nsvgDelete(svgKnightDark);
+    nsvgDelete(svgBishopDark);
+    nsvgDelete(svgQueenDark);
+    nsvgDelete(svgKingDark);
 
-    delete(svgPawnLight);
-    delete(svgRookLight);
-    delete(svgKnightLight);
-    delete(svgBishopLight);
-    delete(svgQueenLight);
-    delete(svgKingLight);
+    nsvgDelete(svgPawnLight);
+    nsvgDelete(svgRookLight);
+    nsvgDelete(svgKnightLight);
+    nsvgDelete(svgBishopLight);
+    nsvgDelete(svgQueenLight);
+    nsvgDelete(svgKingLight);
 }
