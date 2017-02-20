@@ -22,5 +22,21 @@
 
 #include <stdbool.h>
 
+#include "nanosvg.h"
+
+extern struct NSVGimage *svgPawnDark;
+extern struct NSVGimage *svgRookDark;
+extern struct NSVGimage *svgKnightDark;
+extern struct NSVGimage *svgBishopDark;
+extern struct NSVGimage *svgQueenDark;
+extern struct NSVGimage *svgKingDark;
+
+extern struct NSVGimage *svgPawnLight;
+extern struct NSVGimage *svgRookLight;
+extern struct NSVGimage *svgKnightLight;
+extern struct NSVGimage *svgBishopLight;
+extern struct NSVGimage *svgQueenLight;
+extern struct NSVGimage *svgKingLight;
+
 bool Asset_Init(void);
 void Asset_Quit(void);
