@@ -20,6 +20,7 @@
 
 #include <string>
 
+#define TINYOBJLOADER_IMPLEMENTATION
 #include "asset.h"
 #include "SDL.h"
 #include "ZipFile.h"
@@ -67,6 +68,15 @@ struct NSVGimage *svgBishopLight;
 struct NSVGimage *svgQueenLight;
 struct NSVGimage *svgKingLight;
 
+std::vector<tinyobj::shape_t> modelPawn;
+std::vector<tinyobj::shape_t> modelRook;
+std::vector<tinyobj::shape_t> modelKnight;
+std::vector<tinyobj::shape_t> modelBishop;
+std::vector<tinyobj::shape_t> modelQueen;
+std::vector<tinyobj::shape_t> modelKing;
+
+std::vector<tinyobj::shape_t> modelBoard;
+std::vector<tinyobj::material_t> materialBoard;
 
 void ReadLinesAndCopy(std::shared_ptr<ZipArchiveEntry> archiveEntry, char **destination)
 {
@@ -82,7 +92,6 @@ void ReadLinesAndCopy(std::shared_ptr<ZipArchiveEntry> archiveEntry, char **dest
 }
 
 
-// Asset_Quit() should free copied strings.
 bool LoadSVGAssets(std::shared_ptr<ZipArchive> archive)
 {
     char *currentText = NULL;
@@ -178,6 +187,98 @@ bool LoadSVGAssets(std::shared_ptr<ZipArchive> archive)
 }
 
 
+bool LoadModelAssets(std::shared_ptr<ZipArchive> archive)
+{
+    std::string error;
+    std::vector<tinyobj::material_t> unusedMaterials;
+    tinyobj::attrib_t unusedAttributes;
+    std::map<std::string, int> unusedMaterialMap;
+
+    ZipArchiveEntry::Ptr archiveEntry = archive->GetEntry(PIECE_OBJ_PAWN);
+    if (archiveEntry == nullptr)
+        return false;
+    if (!tinyobj::LoadObj(&unusedAttributes, &modelPawn, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+    {
+        if (error.length() > 0)
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+        return false;
+    }
+
+    archiveEntry = archive->GetEntry(PIECE_OBJ_ROOK);
+    if (archiveEntry == nullptr)
+        return false;
+    if (!tinyobj::LoadObj(&unusedAttributes, &modelRook, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+    {
+        if (error.length() > 0)
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+        return false;
+    }
+
+    archiveEntry = archive->GetEntry(PIECE_OBJ_KNIGHT);
+    if (archiveEntry == nullptr)
+        return false;
+    if (!tinyobj::LoadObj(&unusedAttributes, &modelKnight, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+    {
+        if (error.length() > 0)
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+        return false;
+    }
+
+    archiveEntry = archive->GetEntry(PIECE_OBJ_BISHOP);
+    if (archiveEntry == nullptr)
+        return false;
+    if (!tinyobj::LoadObj(&unusedAttributes, &modelBishop, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+    {
+        if (error.length() > 0)
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+        return false;
+    }
+
+    archiveEntry = archive->GetEntry(PIECE_OBJ_QUEEN);
+    if (archiveEntry == nullptr)
+        return false;
+    if (!tinyobj::LoadObj(&unusedAttributes, &modelQueen, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+    {
+        if (error.length() > 0)
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+        return false;
+    }
+
+    archiveEntry = archive->GetEntry(PIECE_OBJ_KING);
+    if (archiveEntry == nullptr)
+        return false;
+    if (!tinyobj::LoadObj(&unusedAttributes, &modelKing, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+    {
+        if (error.length() > 0)
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+        return false;
+    }
+
+    archiveEntry = archive->GetEntry(PIECE_OBJ_BOARD);
+    if (archiveEntry == nullptr)
+        return false;
+    if (!tinyobj::LoadObj(&unusedAttributes, &modelBoard, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+    {
+        if (error.length() > 0)
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+        return false;
+    }
+
+    archiveEntry = archive->GetEntry(PIECE_MTL_BOARD);
+    if (archiveEntry == nullptr) 
+    {
+        if (error.length() > 0)
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+        return false;
+    }
+
+    tinyobj::LoadMtl(&unusedMaterialMap, &materialBoard, archiveEntry->GetDecompressionStream(), &error);
+
+
+    return true;
+}
+
+
 bool Asset_Init(void)
 {
     ZipArchive::Ptr archive = ZipFile::Open("assets");
@@ -188,6 +289,12 @@ bool Asset_Init(void)
         return false;
     }
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: Loaded SVG assets.");
+
+    if (!LoadModelAssets(archive))
+    {
+        return false;
+    }
+    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: Loaded model assets.");
 
     return true;
 }

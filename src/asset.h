@@ -23,6 +23,7 @@
 #include <stdbool.h>
 
 #include "nanosvg.h"
+#include "tiny_obj_loader.h"
 
 extern struct NSVGimage *svgPawnDark;
 extern struct NSVGimage *svgRookDark;
@@ -37,6 +38,16 @@ extern struct NSVGimage *svgKnightLight;
 extern struct NSVGimage *svgBishopLight;
 extern struct NSVGimage *svgQueenLight;
 extern struct NSVGimage *svgKingLight;
+
+extern std::vector<tinyobj::shape_t> modelPawn;
+extern std::vector<tinyobj::shape_t> modelRook;
+extern std::vector<tinyobj::shape_t> modelKnight;
+extern std::vector<tinyobj::shape_t> modelBishop;
+extern std::vector<tinyobj::shape_t> modelQueen;
+extern std::vector<tinyobj::shape_t> modelKing;
+
+extern std::vector<tinyobj::shape_t> modelBoard;
+extern std::vector<tinyobj::material_t> materialBoard;
 
 bool Asset_Init(void);
 void Asset_Quit(void);
