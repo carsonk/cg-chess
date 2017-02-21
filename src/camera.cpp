@@ -67,9 +67,9 @@
 #include "list.h" // List data structure.
 #include "main.h" // Reference the SDL event buffer list provided by the game loop.
 #include "SDL.h" // For SDL_Event structure definition.
-#include <glm\glm.hpp> // include GLM for vectors/matrices
-#include <glm\gtc\matrix_transform.hpp> // Include matrix transform: lookAt, perspective
-#include <glm\gtx\transform.hpp> // Include rotate around angle 
+#include <glm/glm.hpp> // include GLM for vectors/matrices
+#include <glm/gtc/matrix_transform.hpp> // Include matrix transform: lookAt, perspective
+
 
 float FoV = 90;
 float aspect = 512 / 512;
@@ -81,97 +81,97 @@ glm::mat4 projection;
 
 bool Camera_Init(void)
 {
-	//camera matrix tutorial http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
-	//more specific guide for input https://learnopengl.com/#!Getting-started/Camera
-	//create view matrix
-	cameraPos = glm::vec3(0.0, 0.0, 3.0); /*currently arbitrary position of camera*/
-	cameraFront = glm::vec3(0.0, 0.0, -1.0); /*direction vector for where the camera points*/
-	cameraUp = glm::vec3(0.0, 1.0, 0.0); /*up vector*/
-	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    //camera matrix tutorial http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
+    //more specific guide for input https://learnopengl.com/#!Getting-started/Camera
+    //create view matrix
+    cameraPos = glm::vec3(0.0, 0.0, 3.0); /*currently arbitrary position of camera*/
+    cameraFront = glm::vec3(0.0, 0.0, -1.0); /*direction vector for where the camera points*/
+    cameraUp = glm::vec3(0.0, 1.0, 0.0); /*up vector*/
+    view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
-	//create projection matrix
-	projection = glm::perspective(FoV, //field of view, note: should make this global for possible in game settings 
-											aspect, //aspect ratio, window width/height
-											0.1f, //near plane
-											100.0f); //far plane
+    //create projection matrix
+    projection = glm::perspective(FoV, //field of view, note: should make this global for possible in game settings 
+                                    aspect, //aspect ratio, window width/height
+                                            0.1f, //near plane
+                                            100.0f); //far plane
     return true;
 }
 
 // React to an SDL_Event.
 void ProcessEvent(SDL_Event *sdlEvent)
 {
-	// An SDL_Event is a structure that can contain a lot of different event types.
-	// https://wiki.libsdl.org/SDL_Event
+    // An SDL_Event is a structure that can contain a lot of different event types.
+    // https://wiki.libsdl.org/SDL_Event
 
-	// Switch on the type of event.
-	// "type" is from the enumeration "SDL_EventType"
-	// https://wiki.libsdl.org/SDL_EventType?highlight=%28%5CbCategoryEnum%5Cb%29%7C%28CategoryEvents%29
-	switch (sdlEvent->type)
-	{
-		case SDL_MOUSEMOTION:
-			//Arcball rotation with mouse motion https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Arcball
-			
-			glm::vec3 cameraRight = glm::normalize(glm::cross(cameraPos + cameraFront, cameraUp));
-			glm::vec3 cameraUp = glm::normalize(glm::cross(cameraRight, cameraPos + cameraFront));
-			
-			//pitch
-			cameraPos = (glm::rotate(sdlEvent->motion.xrel, cameraRight) * (cameraPos + cameraFront)) - cameraFront;
+    // Switch on the type of event.
+    // "type" is from the enumeration "SDL_EventType"
+    // https://wiki.libsdl.org/SDL_EventType?highlight=%28%5CbCategoryEnum%5Cb%29%7C%28CategoryEvents%29
+    switch (sdlEvent->type)
+    {
+        case SDL_MOUSEMOTION:
+            //Arcball rotation with mouse motion https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Arcball
+            
+            glm::vec3 cameraRight = glm::normalize(glm::cross(cameraPos + cameraFront, cameraUp));
+            glm::vec3 cameraUp = glm::normalize(glm::cross(cameraRight, cameraPos + cameraFront));
+            
+            //pitch
+            cameraPos = (glm::rotate(sdlEvent->motion.xrel, cameraRight) * (cameraPos + cameraFront)) - cameraFront;
 
 
-			//yaw, Y-up system
-			cameraPos = (glm::rotate(sdlEvent->motion.yrel, (0, 1, 0)) * (cameraPos + cameraFront)) - cameraFront;
-				
-				
-			break;
-	}
+            //yaw, Y-up system
+            cameraPos = (glm::rotate(sdlEvent->motion.yrel, (0, 1, 0)) * (cameraPos + cameraFront)) - cameraFront;
+                
+                
+            break;
+    }
 }
 
 void Camera_Logic(uint32_t currentTick)
 {
-	// Iterate through the event buffer, processing events.
+    // Iterate through the event buffer, processing events.
 
-	// Create an iterator for the event buffer.
-	void *listIterator = List_IteratorCreate(sdlEventBuffer);
+    // Create an iterator for the event buffer.
+    void *listIterator = List_IteratorCreate(sdlEventBuffer);
 
-	// Pointer to stored event.
-	SDL_Event *currentEvent;
-	// Get the next event, storing its location into the currentEvent pointer.
-	// If List_IteratorNext() returns false, no more events are available.
-	while (List_IteratorNext(listIterator, (void**)&currentEvent))
-	{
-		ProcessEvent(currentEvent); // Process the event.
+    // Pointer to stored event.
+    SDL_Event *currentEvent;
+    // Get the next event, storing its location into the currentEvent pointer.
+    // If List_IteratorNext() returns false, no more events are available.
+    while (List_IteratorNext(listIterator, (void**)&currentEvent))
+    {
+        ProcessEvent(currentEvent); // Process the event.
 
-									// For example, consume keydown events.
-									// Remember that this is a global event buffer.
-									// If events are consumed here, no input functions hereafter will see the consumed events.
+                                    // For example, consume keydown events.
+                                    // Remember that this is a global event buffer.
+                                    // If events are consumed here, no input functions hereafter will see the consumed events.
 
-									// Iterator makes it safe to remove the current item from the list.
-		if (currentEvent->type == SDL_MOUSEMOTION)
-		{
-			// When an item is removed from the list, it must be freed manually.
-			// The list has no knowledge of the allocation / freeing methods used for the items it contains.
-			// malloc() was used to allocate these items, so free() should be used to free them.
+                                    // Iterator makes it safe to remove the current item from the list.
+        if (currentEvent->type == SDL_MOUSEMOTION)
+        {
+            // When an item is removed from the list, it must be freed manually.
+            // The list has no knowledge of the allocation / freeing methods used for the items it contains.
+            // malloc() was used to allocate these items, so free() should be used to free them.
 
-			// If an item is removed but not freed, a memory leak will occur.
+            // If an item is removed but not freed, a memory leak will occur.
 
-			void *removedItem;
+            void *removedItem;
 
-			// Note that removedItem and currentEvent will point to the same data.
-			// Once free(removedItem) is called, currentEvent will point to garbage data.
-			// currentEvent cannot be dereferenced after this removal.
+            // Note that removedItem and currentEvent will point to the same data.
+            // Once free(removedItem) is called, currentEvent will point to garbage data.
+            // currentEvent cannot be dereferenced after this removal.
 
-			// If List_IteratorRemove() returns false, it failed to remove the item from the list.
-			if (!List_IteratorRemove(listIterator, &removedItem))
-				break; // Serious error. Corruption of list or iterator has occurred.
-			else
-				free(removedItem); // Free the item, now that it has been removed from the list.
+            // If List_IteratorRemove() returns false, it failed to remove the item from the list.
+            if (!List_IteratorRemove(listIterator, &removedItem))
+                break; // Serious error. Corruption of list or iterator has occurred.
+            else
+                free(removedItem); // Free the item, now that it has been removed from the list.
 
-			printf("Sample_Logic: Consumed mouse movement event in global buffer.\n");
-		}
-	}
+            printf("Sample_Logic: Consumed mouse movement event in global buffer.\n");
+        }
+    }
 
-	// Destroy the event buffer iterator.
-	List_IteratorDestroy(listIterator);
+    // Destroy the event buffer iterator.
+    List_IteratorDestroy(listIterator);
 }
 
 void Camera_Quit(void)
