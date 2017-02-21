@@ -189,7 +189,6 @@
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\model.cpp" />
     <ClCompile Include="..\..\src\render.cpp" />
-    <ClCompile Include="..\..\src\sample.cpp" />
     <ClCompile Include="..\..\src\util.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -202,7 +201,6 @@
     <ClInclude Include="..\..\src\main.h" />
     <ClInclude Include="..\..\src\model.h" />
     <ClInclude Include="..\..\src\render.h" />
-    <ClInclude Include="..\..\src\sample.h" />
     <ClInclude Include="..\..\src\util.h" />
   </ItemGroup>
   <ItemGroup>
