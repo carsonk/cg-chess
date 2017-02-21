@@ -69,7 +69,14 @@
 #include "SDL.h" // For SDL_Event structure definition.
 #include <glm/glm.hpp> // include GLM for vectors/matrices
 #include <glm/gtc/matrix_transform.hpp> // Include matrix transform: lookAt, perspective
+#include <glm/gtc/type_ptr.hpp> // include type_ptr to convert mat4 to float[16]
 
+// Must include Windows header prior to including OpenGL header.
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+#include <gl/GL.h>
+#include <gl/GLU.h>
 
 float FoV = 90;
 float aspect = 512 / 512;
@@ -78,6 +85,15 @@ glm::vec3 cameraFront;
 glm::vec3 cameraUp;
 glm::mat4 view;
 glm::mat4 projection;
+
+bool Camera_ViewToModelView()
+{
+    float *viewArray;
+    viewArray = glm::value_ptr(view);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(viewArray);
+    return true;
+}
 
 bool Camera_Init(void)
 {
@@ -91,14 +107,14 @@ bool Camera_Init(void)
 
     //create projection matrix
     projection = glm::perspective(FoV, //field of view, note: should make this global for possible in game settings 
-                                    aspect, //aspect ratio, window width/height
-                                            0.1f, //near plane
-                                            100.0f); //far plane
+                                  aspect, //aspect ratio, window width/height
+                                  0.1f, //near plane
+                                  100.0f); //far plane
     return true;
 }
 
 // React to an SDL_Event.
-void ProcessEvent(SDL_Event *sdlEvent)
+void ProcessMotion(SDL_Event *sdlEvent)
 {
     // An SDL_Event is a structure that can contain a lot of different event types.
     // https://wiki.libsdl.org/SDL_Event
@@ -114,12 +130,13 @@ void ProcessEvent(SDL_Event *sdlEvent)
             glm::vec3 cameraRight = glm::normalize(glm::cross(cameraPos + cameraFront, cameraUp));
             glm::vec3 cameraUp = glm::normalize(glm::cross(cameraRight, cameraPos + cameraFront));
             
+            printf("Camera: the mouse moved x: %d, y: %d from last pos", sdlEvent->motion.xrel, sdlEvent->motion.yrel);
             //pitch
-            cameraPos = (glm::rotate(sdlEvent->motion.xrel, cameraRight) * (cameraPos + cameraFront)) - cameraFront;
+            //cameraPos = (glm::rotate(sdlEvent->motion.xrel, cameraRight) * (cameraPos + cameraFront)) - cameraFront;
 
 
             //yaw, Y-up system
-            cameraPos = (glm::rotate(sdlEvent->motion.yrel, (0, 1, 0)) * (cameraPos + cameraFront)) - cameraFront;
+            //cameraPos = (glm::rotate(sdlEvent->motion.yrel, (0, 1, 0)) * (cameraPos + cameraFront)) - cameraFront;
                 
                 
             break;
@@ -139,7 +156,7 @@ void Camera_Logic(uint32_t currentTick)
     // If List_IteratorNext() returns false, no more events are available.
     while (List_IteratorNext(listIterator, (void**)&currentEvent))
     {
-        ProcessEvent(currentEvent); // Process the event.
+        ProcessMotion(currentEvent); // Process the event.
 
                                     // For example, consume keydown events.
                                     // Remember that this is a global event buffer.

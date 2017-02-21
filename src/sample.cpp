@@ -91,10 +91,11 @@ void ProcessEvent(SDL_Event *sdlEvent)
                 printf("Sample_Logic: The right mouse button was released.\n");
             break;
             // The mouse was moved.
-        case SDL_MOUSEMOTION:
+        /*case SDL_MOUSEMOTION:
             printf("Sample_Logic: The mouse moved to (%d, %d).\n", sdlEvent->motion.x, sdlEvent->motion.y);
             printf("It moved by (%d, %d) from its last recorded position.\n", sdlEvent->motion.xrel, sdlEvent->motion.yrel);
             break;
+        */
     }
 }
 
