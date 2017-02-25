@@ -22,5 +22,44 @@
 
 #include <stdbool.h>
 
+#include "nanosvg.h"
+#include "tiny_obj_loader.h"
+
+extern struct NSVGimage *svgPawnDark;
+extern struct NSVGimage *svgRookDark;
+extern struct NSVGimage *svgKnightDark;
+extern struct NSVGimage *svgBishopDark;
+extern struct NSVGimage *svgQueenDark;
+extern struct NSVGimage *svgKingDark;
+
+extern struct NSVGimage *svgPawnLight;
+extern struct NSVGimage *svgRookLight;
+extern struct NSVGimage *svgKnightLight;
+extern struct NSVGimage *svgBishopLight;
+extern struct NSVGimage *svgQueenLight;
+extern struct NSVGimage *svgKingLight;
+
+extern tinyobj::attrib_t modelPawnAttrib;
+extern std::vector<tinyobj::shape_t> modelPawnShape;
+
+extern tinyobj::attrib_t modelRookAttrib;
+extern std::vector<tinyobj::shape_t> modelRookShape;
+
+extern tinyobj::attrib_t modelKnightAttrib;
+extern std::vector<tinyobj::shape_t> modelKnightShape;
+
+extern tinyobj::attrib_t modelBishopAttrib;
+extern std::vector<tinyobj::shape_t> modelBishopShape;
+
+extern tinyobj::attrib_t modelQueenAttrib;
+extern std::vector<tinyobj::shape_t> modelQueenShape;
+
+extern tinyobj::attrib_t modelKingAttrib;
+extern std::vector<tinyobj::shape_t> modelKingShape;
+
+extern tinyobj::attrib_t modelBoardAttrib;
+extern std::vector<tinyobj::shape_t> modelBoardShape;
+extern std::vector<tinyobj::material_t> modelBoardMaterial;
+
 bool Asset_Init(void);
 void Asset_Quit(void);

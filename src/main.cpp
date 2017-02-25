@@ -29,7 +29,6 @@
 #include "list.h"
 #include "main.h"
 #include "render.h"
-#include "sample.h"
 #include "SDL.h"
 
 
@@ -69,9 +68,6 @@ static void DoInput(uint32_t currentTick)
 
 static void DoLogic(uint32_t currentTick)
 {
-    // Demonstration logic.
-    Sample_Logic(currentTick);
-
     Camera_Logic(currentTick);
     Input_Logic(currentTick);
     Game_Logic(currentTick);

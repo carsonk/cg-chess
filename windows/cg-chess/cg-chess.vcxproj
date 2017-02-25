@@ -104,8 +104,13 @@
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>python  "$(SolutionDir)..\scripts\postbuild.py" $(SolutionDir)..\ 32 $(SolutionDir)..\bin\$(Platform)\$(Configuration)\</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
+    <CustomBuildStep>
+      <Command>python  "$(SolutionDir)..\scripts\postbuild.py" $(SolutionDir)..\ 32 $(SolutionDir)..\bin\$(Platform)\$(Configuration)\</Command>
+      <Outputs>nonexistentfile</Outputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -119,8 +124,13 @@
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>python  "$(SolutionDir)..\scripts\postbuild.py" $(SolutionDir)..\ 64 $(SolutionDir)..\bin\$(Platform)\$(Configuration)\</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
+    <CustomBuildStep>
+      <Command>python  "$(SolutionDir)..\scripts\postbuild.py" $(SolutionDir)..\ 64 $(SolutionDir)..\bin\$(Platform)\$(Configuration)\</Command>
+      <Outputs>nonexistentfile</Outputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -138,8 +148,13 @@
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>python  "$(SolutionDir)..\scripts\postbuild.py" $(SolutionDir)..\ 32 $(SolutionDir)..\bin\$(Platform)\$(Configuration)\</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
+    <CustomBuildStep>
+      <Command>python  "$(SolutionDir)..\scripts\postbuild.py" $(SolutionDir)..\ 32 $(SolutionDir)..\bin\$(Platform)\$(Configuration)\</Command>
+      <Outputs>nonexistentfile</Outputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -157,8 +172,13 @@
       <AdditionalDependencies>bzip2.lib;lzma.lib;zlib.lib;ZipLib.lib;Stockfish.lib;glu32.lib;OpenGL32.lib;SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>python  "$(SolutionDir)..\scripts\postbuild.py" $(SolutionDir)..\ 64 $(SolutionDir)..\bin\$(Platform)\$(Configuration)\</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
+    <CustomBuildStep>
+      <Command>python  "$(SolutionDir)..\scripts\postbuild.py" $(SolutionDir)..\ 64 $(SolutionDir)..\bin\$(Platform)\$(Configuration)\</Command>
+      <Outputs>nonexistentfile</Outputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\asset.cpp" />
@@ -169,7 +189,6 @@
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\model.cpp" />
     <ClCompile Include="..\..\src\render.cpp" />
-    <ClCompile Include="..\..\src\sample.cpp" />
     <ClCompile Include="..\..\src\util.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -182,7 +201,6 @@
     <ClInclude Include="..\..\src\main.h" />
     <ClInclude Include="..\..\src\model.h" />
     <ClInclude Include="..\..\src\render.h" />
-    <ClInclude Include="..\..\src\sample.h" />
     <ClInclude Include="..\..\src\util.h" />
   </ItemGroup>
   <ItemGroup>

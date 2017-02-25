@@ -20,9 +20,13 @@
 
 #include <string>
 
+#define TINYOBJLOADER_IMPLEMENTATION
 #include "asset.h"
 #include "SDL.h"
 #include "ZipFile.h"
+
+#define NANOSVG_IMPLEMENTATION
+#include "nanosvg.h"
 
 
 #define PIECE_SVG_PAWN_DARK "svg/Chess_pdt45.svg"
@@ -40,22 +44,53 @@
 #define PIECE_SVG_KING_LIGHT "svg/Chess_klt45.svg"
 
 
-const char *svgPawnDark;
-const char *svgRookDark;
-const char *svgKnightDark;
-const char *svgBishopDark;
-const char *svgQueenDark;
-const char *svgKingDark;
+#define PIECE_OBJ_PAWN "obj/pawn.obj"
+#define PIECE_OBJ_ROOK "obj/rook.obj"
+#define PIECE_OBJ_KNIGHT "obj/knight.obj"
+#define PIECE_OBJ_BISHOP "obj/bishop.obj"
+#define PIECE_OBJ_QUEEN "obj/queen.obj"
+#define PIECE_OBJ_KING "obj/king.obj"
 
-const char *svgPawnLight;
-const char *svgRookLight;
-const char *svgKnightLight;
-const char *svgBishopLight;
-const char *svgQueenLight;
-const char *svgKingLight;
+#define PIECE_OBJ_BOARD "obj/board.obj"
+#define PIECE_MTL_BOARD "mtl/board.mtl"
 
+struct NSVGimage *svgPawnDark;
+struct NSVGimage *svgRookDark;
+struct NSVGimage *svgKnightDark;
+struct NSVGimage *svgBishopDark;
+struct NSVGimage *svgQueenDark;
+struct NSVGimage *svgKingDark;
 
-void ReadLinesAndCopy(std::shared_ptr<ZipArchiveEntry> archiveEntry, const char *destination)
+struct NSVGimage *svgPawnLight;
+struct NSVGimage *svgRookLight;
+struct NSVGimage *svgKnightLight;
+struct NSVGimage *svgBishopLight;
+struct NSVGimage *svgQueenLight;
+struct NSVGimage *svgKingLight;
+
+tinyobj::attrib_t modelPawnAttrib;
+std::vector<tinyobj::shape_t> modelPawnShape;
+
+tinyobj::attrib_t modelRookAttrib;
+std::vector<tinyobj::shape_t> modelRookShape;
+
+tinyobj::attrib_t modelKnightAttrib;
+std::vector<tinyobj::shape_t> modelKnightShape;
+
+tinyobj::attrib_t modelBishopAttrib;
+std::vector<tinyobj::shape_t> modelBishopShape;
+
+tinyobj::attrib_t modelQueenAttrib;
+std::vector<tinyobj::shape_t> modelQueenShape;
+
+tinyobj::attrib_t modelKingAttrib;
+std::vector<tinyobj::shape_t> modelKingShape;
+
+tinyobj::attrib_t modelBoardAttrib;
+std::vector<tinyobj::shape_t> modelBoardShape;
+std::vector<tinyobj::material_t> modelBoardMaterial;
+
+void ReadLinesAndCopy(std::shared_ptr<ZipArchiveEntry> archiveEntry, char **destination)
 {
     // http://stackoverflow.com/questions/3203452/how-to-read-entire-stream-into-a-stdstring
     std::istream *decompressionStream = archiveEntry->GetDecompressionStream();
@@ -65,74 +100,191 @@ void ReadLinesAndCopy(std::shared_ptr<ZipArchiveEntry> archiveEntry, const char 
     char *copiedString = new char[allLines.length() + 1];
     strcpy_s(copiedString, allLines.length() + 1, allLines.c_str());
 
-    destination = copiedString;
+    *destination = copiedString;
 }
 
 
-// Asset_Quit() should free copied strings.
 bool LoadSVGAssets(std::shared_ptr<ZipArchive> archive)
 {
+    char *currentText = NULL;
+
     // Dark Pieces
     ZipArchiveEntry::Ptr archiveEntry = archive->GetEntry(PIECE_SVG_PAWN_DARK);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgPawnDark);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgPawnDark = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_ROOK_DARK);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgRookDark);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgRookDark = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_KNIGHT_DARK);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgKnightDark);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgKnightDark = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_BISHOP_DARK);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgBishopDark);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgBishopDark = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_QUEEN_DARK);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgQueenDark);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgQueenDark = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_KING_DARK);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgKingDark);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgKingDark = nsvgParse(currentText, "px", 96);
+    delete(currentText);
+
 
     // Light Pieces
     archiveEntry = archive->GetEntry(PIECE_SVG_PAWN_LIGHT);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgPawnLight);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgPawnLight = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_ROOK_LIGHT);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgRookLight);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgRookLight = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_KNIGHT_LIGHT);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgKnightLight);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgKnightLight = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_BISHOP_LIGHT);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgBishopLight);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgBishopLight = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_QUEEN_LIGHT);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgQueenLight);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgQueenLight = nsvgParse(currentText, "px", 96);
+    delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_KING_LIGHT);
     if (archiveEntry == nullptr)
         return false;
-    ReadLinesAndCopy(archiveEntry, svgQueenLight);
+    ReadLinesAndCopy(archiveEntry, &currentText);
+    svgKingLight = nsvgParse(currentText, "px", 96);
+    delete(currentText);
+
+    return true;
+}
+
+
+bool LoadModelAssets(std::shared_ptr<ZipArchive> archive)
+{
+    std::string error;
+    std::vector<tinyobj::material_t> unusedMaterials;
+    std::map<std::string, int> unusedMaterialMap;
+
+    ZipArchiveEntry::Ptr archiveEntry = archive->GetEntry(PIECE_OBJ_PAWN);
+    if (archiveEntry == nullptr)
+        return false;
+    if (!tinyobj::LoadObj(&modelPawnAttrib, &modelPawnShape, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+    {
+        if (error.length() > 0)
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+        return false;
+    }
+
+    archiveEntry = archive->GetEntry(PIECE_OBJ_ROOK);
+    if (archiveEntry == nullptr)
+        return false;
+    if (!tinyobj::LoadObj(&modelRookAttrib, &modelRookShape, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+    {
+        if (error.length() > 0)
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+        return false;
+    }
+
+    archiveEntry = archive->GetEntry(PIECE_OBJ_KNIGHT);
+    if (archiveEntry == nullptr)
+        return false;
+    if (!tinyobj::LoadObj(&modelKnightAttrib, &modelKnightShape, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+    {
+        if (error.length() > 0)
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+        return false;
+    }
+
+    archiveEntry = archive->GetEntry(PIECE_OBJ_BISHOP);
+    if (archiveEntry == nullptr)
+        return false;
+    if (!tinyobj::LoadObj(&modelBishopAttrib, &modelBishopShape, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+    {
+        if (error.length() > 0)
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+        return false;
+    }
+
+    archiveEntry = archive->GetEntry(PIECE_OBJ_QUEEN);
+    if (archiveEntry == nullptr)
+        return false;
+    if (!tinyobj::LoadObj(&modelQueenAttrib, &modelQueenShape, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+    {
+        if (error.length() > 0)
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+        return false;
+    }
+
+    archiveEntry = archive->GetEntry(PIECE_OBJ_KING);
+    if (archiveEntry == nullptr)
+        return false;
+    if (!tinyobj::LoadObj(&modelKingAttrib, &modelKingShape, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+    {
+        if (error.length() > 0)
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+        return false;
+    }
+
+    archiveEntry = archive->GetEntry(PIECE_OBJ_BOARD);
+    if (archiveEntry == nullptr)
+        return false;
+    if (!tinyobj::LoadObj(&modelBoardAttrib, &modelBoardShape, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+    {
+        if (error.length() > 0)
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+        return false;
+    }
+
+    archiveEntry = archive->GetEntry(PIECE_MTL_BOARD);
+    if (archiveEntry == nullptr) 
+    {
+        if (error.length() > 0)
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+        return false;
+    }
+
+    tinyobj::LoadMtl(&unusedMaterialMap, &modelBoardMaterial, archiveEntry->GetDecompressionStream(), &error);
+
 
     return true;
 }
@@ -149,23 +301,29 @@ bool Asset_Init(void)
     }
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: Loaded SVG assets.");
 
+    if (!LoadModelAssets(archive))
+    {
+        return false;
+    }
+    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: Loaded model assets.");
+
     return true;
 }
 
 
 void Asset_Quit(void)
 {
-    delete(svgPawnDark);
-    delete(svgRookDark);
-    delete(svgKnightDark);
-    delete(svgBishopDark);
-    delete(svgQueenDark);
-    delete(svgKingDark);
+    nsvgDelete(svgPawnDark);
+    nsvgDelete(svgRookDark);
+    nsvgDelete(svgKnightDark);
+    nsvgDelete(svgBishopDark);
+    nsvgDelete(svgQueenDark);
+    nsvgDelete(svgKingDark);
 
-    delete(svgPawnLight);
-    delete(svgRookLight);
-    delete(svgKnightLight);
-    delete(svgBishopLight);
-    delete(svgQueenLight);
-    delete(svgKingLight);
+    nsvgDelete(svgPawnLight);
+    nsvgDelete(svgRookLight);
+    nsvgDelete(svgKnightLight);
+    nsvgDelete(svgBishopLight);
+    nsvgDelete(svgQueenLight);
+    nsvgDelete(svgKingLight);
 }
