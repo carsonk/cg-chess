@@ -19,3 +19,9 @@
 */
 
 #pragma once
+
+#include "glm/mat4x3.hpp"
+#include "tiny_obj_loader.h"
+
+
+std::vector<glm::mat4x3>* Util_FindBoundingBox(tinyobj::attrib_t attrib, std::vector<tinyobj::shape_t> shapes);

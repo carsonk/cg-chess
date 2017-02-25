@@ -39,15 +39,27 @@ extern struct NSVGimage *svgBishopLight;
 extern struct NSVGimage *svgQueenLight;
 extern struct NSVGimage *svgKingLight;
 
-extern std::vector<tinyobj::shape_t> modelPawn;
-extern std::vector<tinyobj::shape_t> modelRook;
-extern std::vector<tinyobj::shape_t> modelKnight;
-extern std::vector<tinyobj::shape_t> modelBishop;
-extern std::vector<tinyobj::shape_t> modelQueen;
-extern std::vector<tinyobj::shape_t> modelKing;
+extern tinyobj::attrib_t modelPawnAttrib;
+extern std::vector<tinyobj::shape_t> modelPawnShape;
 
-extern std::vector<tinyobj::shape_t> modelBoard;
-extern std::vector<tinyobj::material_t> materialBoard;
+extern tinyobj::attrib_t modelRookAttrib;
+extern std::vector<tinyobj::shape_t> modelRookShape;
+
+extern tinyobj::attrib_t modelKnightAttrib;
+extern std::vector<tinyobj::shape_t> modelKnightShape;
+
+extern tinyobj::attrib_t modelBishopAttrib;
+extern std::vector<tinyobj::shape_t> modelBishopShape;
+
+extern tinyobj::attrib_t modelQueenAttrib;
+extern std::vector<tinyobj::shape_t> modelQueenShape;
+
+extern tinyobj::attrib_t modelKingAttrib;
+extern std::vector<tinyobj::shape_t> modelKingShape;
+
+extern tinyobj::attrib_t modelBoardAttrib;
+extern std::vector<tinyobj::shape_t> modelBoardShape;
+extern std::vector<tinyobj::material_t> modelBoardMaterial;
 
 bool Asset_Init(void);
 void Asset_Quit(void);
