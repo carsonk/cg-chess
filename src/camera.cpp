@@ -75,23 +75,38 @@
 #ifdef _WIN32
 #include <Windows.h>
 #endif
+#include <gl/glut.h>
 #include <gl/GL.h>
 #include <gl/GLU.h>
 
-float FoV = 90;
-float aspect = 512 / 512;
+float FOV = 90;
+float width = 512;
+float height = 512;
+float aspect = width / height;
+bool mousePressed = false;
 glm::vec3 cameraPos;
-glm::vec3 cameraFront;
+glm::vec3 cameraTarget;
 glm::vec3 cameraUp;
 glm::mat4 view;
 glm::mat4 projection;
 
 bool Camera_ViewToModelView()
 {
-    float *viewArray;
-    viewArray = glm::value_ptr(view);
     glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(viewArray);
+    glLoadMatrixf(glm::value_ptr(view));
+    
+    return true;
+}
+
+bool Camera_ReloadProjection()
+{
+    projection = glm::perspective(FOV, //field of view,  
+                                  aspect, //aspect ratio, window width/height
+                                  0.1f, //near plane
+                                  100.0f); //far plane
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(glm::value_ptr(projection));
+    
     return true;
 }
 
@@ -100,16 +115,19 @@ bool Camera_Init(void)
     //camera matrix tutorial http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
     //more specific guide for input https://learnopengl.com/#!Getting-started/Camera
     //create view matrix
-    cameraPos = glm::vec3(0.0, 0.0, 3.0); /*currently arbitrary position of camera*/
-    cameraFront = glm::vec3(0.0, 0.0, -1.0); /*direction vector for where the camera points*/
-    cameraUp = glm::vec3(0.0, 1.0, 0.0); /*up vector*/
-    view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    cameraPos = glm::vec3(0.0, 1.0, 3.0); /* position of camera*/
+    cameraTarget = glm::vec3(0.0, 0.0, 1.0); /* vector for camera target */
+    cameraUp = glm::vec3(0.0, 1.0, 0.0); /* up vector */
+    view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
+    Camera_ViewToModelView();
 
     //create projection matrix
-    projection = glm::perspective(FoV, //field of view, note: should make this global for possible in game settings 
+    projection = glm::perspective(FOV, //field of view
                                   aspect, //aspect ratio, window width/height
                                   0.1f, //near plane
                                   100.0f); //far plane
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(glm::value_ptr(projection));
     return true;
 }
 
@@ -125,20 +143,21 @@ void ProcessMotion(SDL_Event *sdlEvent)
     switch (sdlEvent->type)
     {
         case SDL_MOUSEMOTION:
-            //Arcball rotation with mouse motion https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Arcball
-            
-            glm::vec3 cameraRight = glm::normalize(glm::cross(cameraPos + cameraFront, cameraUp));
-            glm::vec3 cameraUp = glm::normalize(glm::cross(cameraRight, cameraPos + cameraFront));
-            
-            printf("Camera: the mouse moved x: %d, y: %d from last pos", sdlEvent->motion.xrel, sdlEvent->motion.yrel);
-            //pitch
-            //cameraPos = (glm::rotate(sdlEvent->motion.xrel, cameraRight) * (cameraPos + cameraFront)) - cameraFront;
-
-
-            //yaw, Y-up system
-            //cameraPos = (glm::rotate(sdlEvent->motion.yrel, (0, 1, 0)) * (cameraPos + cameraFront)) - cameraFront;
+            if (mousePressed) {
+                //Arcball rotation with mouse motion https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Arcball
+                glm::vec4 cameraFocusVector = glm::vec4(cameraPos - cameraTarget, 0); /* create vector to target */
+                glm::mat4 yawRotate = glm::rotate(glm::mat4(), float(sdlEvent->motion.xrel * 3.14 / 180.0), cameraUp); /* create rotation matrix */
+                cameraFocusVector = yawRotate * cameraFocusVector; /* do the rotation */
+                cameraPos = cameraFocusVector + glm::vec4(cameraTarget, 0); /* change camera position */
+                view = glm::lookAt(cameraPos, cameraTarget, cameraUp); /* change view matrix */
+            }
                 
-                
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+            mousePressed = true;
+            break;
+        case SDL_MOUSEBUTTONUP:
+            mousePressed = false;
             break;
     }
 }
@@ -163,28 +182,6 @@ void Camera_Logic(uint32_t currentTick)
                                     // If events are consumed here, no input functions hereafter will see the consumed events.
 
                                     // Iterator makes it safe to remove the current item from the list.
-        if (currentEvent->type == SDL_MOUSEMOTION)
-        {
-            // When an item is removed from the list, it must be freed manually.
-            // The list has no knowledge of the allocation / freeing methods used for the items it contains.
-            // malloc() was used to allocate these items, so free() should be used to free them.
-
-            // If an item is removed but not freed, a memory leak will occur.
-
-            void *removedItem;
-
-            // Note that removedItem and currentEvent will point to the same data.
-            // Once free(removedItem) is called, currentEvent will point to garbage data.
-            // currentEvent cannot be dereferenced after this removal.
-
-            // If List_IteratorRemove() returns false, it failed to remove the item from the list.
-            if (!List_IteratorRemove(listIterator, &removedItem))
-                break; // Serious error. Corruption of list or iterator has occurred.
-            else
-                free(removedItem); // Free the item, now that it has been removed from the list.
-
-            printf("Sample_Logic: Consumed mouse movement event in global buffer.\n");
-        }
     }
 
     // Destroy the event buffer iterator.
