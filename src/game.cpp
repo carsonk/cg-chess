@@ -61,3 +61,66 @@ void Game_Quit(void)
 {
 
 }
+
+BOARD_STATE getEmptyBoard(void) {
+    BOARD_STATE freshBoard;
+    for (int i = 0; i < NUM_RANKS; i++) {
+        for (int j = 0; j < NUM_FILES; j++) {//Board is being filled from Bottom left(white), along the file.
+            if (i = 0) { //Rank 1
+                switch (j) {
+                case 0:
+                case 7:
+                    freshBoard.pieces[i][j] = PIECE_ROOK;
+                    break;
+                case 1:
+                case 6:
+                    freshBoard.pieces[i][j] = PIECE_KNIGHT;
+                    break;
+                case 2:
+                case 5:
+                    freshBoard.pieces[i][j] = PIECE_BISHOP;
+                    break;
+                case 3:
+                    freshBoard.pieces[i][j] = PIECE_QUEEN;
+                    break;
+                case 4:
+                    freshBoard.pieces[i][j] = PIECE_KING;
+                    break;
+                }
+            }
+            else if (i = 1) {//Rank 1 -- Pawns
+                freshBoard.pieces[i][j] = PIECE_PAWN;
+            }
+            else if (i = 6) {//Rank 6 -- BPawns
+                freshBoard.pieces[i][j] = PIECE_BPAWN;
+            }
+            else if (i = 7) { //Rank 7
+                switch (j) {
+                case 0:
+                case 7:
+                    freshBoard.pieces[i][j] = PIECE_BROOK;
+                    break;
+                case 1:
+                case 6:
+                    freshBoard.pieces[i][j] = PIECE_BKNIGHT;
+                    break;
+                case 2:
+                case 5:
+                    freshBoard.pieces[i][j] = PIECE_BBISHOP;
+                    break;
+                case 3:
+                    freshBoard.pieces[i][j] = PIECE_BQUEEN;
+                    break;
+                case 4:
+                    freshBoard.pieces[i][j] = PIECE_BKING;
+                    break;
+                }
+            }
+            else {
+                freshBoard.pieces[i][j] = PIECE_EMPTY;
+            }
+        }
+    }
+
+    return freshBoard;
+}

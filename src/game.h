@@ -23,6 +23,38 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define NUM_RANKS 8
+#define NUM_FILES 8
+
+typedef enum {
+    PIECE_EMPTY = 0,
+    PIECE_PAWN,
+    PIECE_KNIGHT,
+    PIECE_BISHOP,
+    PIECE_ROOK,
+    PIECE_QUEEN,
+    PIECE_KING,
+    PIECE_BPAWN,
+    PIECE_BKNIGHT,
+    PIECE_BBISHOP,
+    PIECE_BROOK,
+    PIECE_BQUEEN,
+    PIECE_BKING
+} GAME_PIECE;
+
+typedef enum {
+    COLOR_WHITE,
+    COLOR_BLACK
+} GAME_COLOR;
+
+typedef struct {
+    GAME_PIECE pieces[NUM_RANKS][NUM_FILES];
+    unsigned move_num;
+    GAME_COLOR current_turn;
+} BOARD_STATE;
+
+extern BOARD_STATE boardState;
+
 bool Game_Init(void);
 void Game_Logic(uint32_t currentTick);
 void Game_Quit(void);
