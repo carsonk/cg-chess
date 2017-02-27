@@ -100,15 +100,12 @@ bool Camera_ViewToModelView()
 
 bool Camera_ReloadProjection()
 {
-    projection = glm::perspective(FOV, //field of view,  
-                                  aspect, //aspect ratio, window width/height
-                                  0.1f, //near plane
-                                  100.0f); //far plane
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(glm::value_ptr(projection));
-    
+
     return true;
 }
+
 
 bool Camera_Init(void)
 {
@@ -151,7 +148,6 @@ void ProcessMotion(SDL_Event *sdlEvent)
                 cameraPos = cameraFocusVector + glm::vec4(cameraTarget, 0); /* change camera position */
                 view = glm::lookAt(cameraPos, cameraTarget, cameraUp); /* change view matrix */
             }
-                
             break;
         case SDL_MOUSEBUTTONDOWN:
             mousePressed = true;
@@ -159,6 +155,23 @@ void ProcessMotion(SDL_Event *sdlEvent)
         case SDL_MOUSEBUTTONUP:
             mousePressed = false;
             break;
+        case SDL_MOUSEWHEEL:
+            int scrollAmt = sdlEvent->wheel.y;
+            if ((FOV >= 90.5 && scrollAmt > 0) || (FOV <= 88.5 && scrollAmt < 0))
+            {
+                //do nothing
+            }
+            else
+            {
+                FOV = FOV + scrollAmt * 0.01;
+            }
+            projection = glm::perspective(FOV, //field of view
+                aspect, //aspect ratio, window width/height
+                0.1f, //near plane
+                100.0f); //far plane
+            Camera_ReloadProjection();
+            break;
+
     }
 }
 
