@@ -34,6 +34,10 @@ StateListPtr States(new std::deque<StateInfo>(1));
 // Opening game state.
 const char *startFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
+BOARD_STATE boardState = {};
+
+BOARD_STATE getEmptyBoard(void);
+
 bool Game_Init(void)
 {
     UCI::init(Options);
@@ -46,6 +50,8 @@ bool Game_Init(void)
     Tablebases::init(Options["SyzygyPath"]);
 
     currentPosition.set(startFEN, false, &States->back(), Threads.main());
+
+    boardState = getEmptyBoard();
 
     return true;
 }
