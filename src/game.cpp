@@ -20,14 +20,6 @@
 
 #include "game.h"
 
-#include "Stockfish\src\bitboard.h"
-#include "Stockfish\src\position.h"
-#include "Stockfish\src\search.h"
-#include "Stockfish\src\thread.h"
-#include "Stockfish\src\tt.h"
-#include "Stockfish\src\uci.h"
-#include "Stockfish\src\syzygy\tbprobe.h"
-
 Position currentPosition;
 StateListPtr States(new std::deque<StateInfo>(1));
 
@@ -35,6 +27,9 @@ StateListPtr States(new std::deque<StateInfo>(1));
 const char *startFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 BOARD_STATE boardState = {};
+
+Move moveAttempt = MOVE_NONE;
+GAME_STATUS gameStatus = GSTATUS_NOCHANGE;
 
 BOARD_STATE getEmptyBoard(void);
 
@@ -59,7 +54,25 @@ bool Game_Init(void)
 
 void Game_Logic(uint32_t currentTick)
 {
-    Move moveAttempt;
+
+    if (moveAttempt != MOVE_NONE && moveAttempt != MOVE_NULL) {
+        if (currentPosition.legal(moveAttempt)) {
+            // Move is legal. Update board state, change move, etc.
+
+            gameStatus = GSTATUS_MOVE_SUCCESS;
+
+            if (currentPosition.gives_check(moveAttempt))
+                gameStatus = GSTATUS_MOVE_SUCCESS_CHECK;
+
+            currentPosition.do_move(moveAttempt, States->back());
+        } else {
+            // Move is not legal.
+
+            gameStatus = GSTATUS_MOVE_INVALID;
+        }
+    } else {
+        gameStatus = GSTATUS_NOCHANGE;
+    }
 }
 
 

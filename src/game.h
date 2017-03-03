@@ -23,6 +23,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "Stockfish\src\bitboard.h"
+#include "Stockfish\src\position.h"
+#include "Stockfish\src\search.h"
+#include "Stockfish\src\thread.h"
+#include "Stockfish\src\tt.h"
+#include "Stockfish\src\uci.h"
+#include "Stockfish\src\syzygy\tbprobe.h"
+
 #define NUM_RANKS 8
 #define NUM_FILES 8
 
@@ -53,7 +61,21 @@ typedef struct {
     GAME_COLOR current_turn;
 } BOARD_STATE;
 
+typedef enum {
+    GSTATUS_NOCHANGE,
+    GSTATUS_MOVE_SUCCESS,
+    GSTATUS_MOVE_SUCCESS_CHECK,
+    GSTATUS_MOVE_INVALID
+} GAME_STATUS;
+
+// The current state of the board.
 extern BOARD_STATE boardState;
+
+// Logic will check for this value and handle it on each round.
+extern Move moveAttempt;
+
+// The current status of the game module.
+extern GAME_STATUS gameStatus;
 
 bool Game_Init(void);
 void Game_Logic(uint32_t currentTick);
