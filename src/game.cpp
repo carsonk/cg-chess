@@ -85,7 +85,7 @@ BOARD_STATE getEmptyBoard(void) {
     BOARD_STATE freshBoard;
     for (int i = 0; i < NUM_RANKS; i++) {
         for (int j = 0; j < NUM_FILES; j++) {//Board is being filled from Bottom left(white), along the file.
-            if (i = 0) { //Rank 1
+            if (i == 0) { //Rank 1
                 switch (j) {
                 case 0:
                 case 7:
@@ -107,13 +107,13 @@ BOARD_STATE getEmptyBoard(void) {
                     break;
                 }
             }
-            else if (i = 1) {//Rank 1 -- Pawns
+            else if (i == 1) {//Rank 1 -- Pawns
                 freshBoard.pieces[i][j] = PIECE_PAWN;
             }
-            else if (i = 6) {//Rank 6 -- BPawns
+            else if (i == 6) {//Rank 6 -- BPawns
                 freshBoard.pieces[i][j] = PIECE_BPAWN;
             }
-            else if (i = 7) { //Rank 7
+            else if (i == 7) { //Rank 7
                 switch (j) {
                 case 0:
                 case 7:
