@@ -138,6 +138,25 @@ void ProcessMotion(SDL_Event *sdlEvent)
     // https://wiki.libsdl.org/SDL_EventType?highlight=%28%5CbCategoryEnum%5Cb%29%7C%28CategoryEvents%29
     switch (sdlEvent->type)
     {
+		case SDL_KEYDOWN:
+			if (sdlEvent->key.keysym.sym == SDLK_t)
+			{
+				viewMode2D = !viewMode2D;
+				if (viewMode2D)
+				{
+					projection = glm::ortho(0.0f, 1.0f, 0.0f, 1.0f);
+					Camera_ReloadProjection();
+				}
+				else
+				{
+					projection = glm::perspective(FOV, //field of view
+						aspect, //aspect ratio, window width/height
+						0.1f, //near plane
+						100.0f); //far plane
+					Camera_ReloadProjection();
+				}
+			}
+			break;
 		case SDL_MOUSEMOTION:
             if (mousePressed) {
                 //Arcball rotation with mouse motion https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Arcball
