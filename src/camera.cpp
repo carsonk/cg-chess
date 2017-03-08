@@ -75,7 +75,6 @@
 #ifdef _WIN32
 #include <Windows.h>
 #endif
-#include <gl/glut.h>
 #include <gl/GL.h>
 #include <gl/GLU.h>
 
@@ -84,6 +83,7 @@ float width = 512;
 float height = 512;
 float aspect = width / height;
 bool mousePressed = false;
+bool viewMode2D = false;
 glm::vec3 cameraPos;
 glm::vec3 cameraTarget;
 glm::vec3 cameraUp;
@@ -123,8 +123,7 @@ bool Camera_Init(void)
                                   aspect, //aspect ratio, window width/height
                                   0.1f, //near plane
                                   100.0f); //far plane
-    glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(glm::value_ptr(projection));
+	Camera_ReloadProjection();
     return true;
 }
 
@@ -139,7 +138,7 @@ void ProcessMotion(SDL_Event *sdlEvent)
     // https://wiki.libsdl.org/SDL_EventType?highlight=%28%5CbCategoryEnum%5Cb%29%7C%28CategoryEvents%29
     switch (sdlEvent->type)
     {
-        case SDL_MOUSEMOTION:
+		case SDL_MOUSEMOTION:
             if (mousePressed) {
                 //Arcball rotation with mouse motion https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Arcball
                 glm::vec4 cameraFocusVector = glm::vec4(cameraPos - cameraTarget, 0); /* create vector to target */
@@ -171,7 +170,6 @@ void ProcessMotion(SDL_Event *sdlEvent)
                 100.0f); //far plane
             Camera_ReloadProjection();
             break;
-
     }
 }
 
