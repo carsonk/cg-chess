@@ -21,6 +21,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include "camera.h"
 #include "list.h"
 #include "main.h"
 #include "render.h"
@@ -34,6 +35,9 @@
 #include <gl/GLU.h>
 
 
+static bool lastViewMode2D;
+
+
 bool Render_Init(bool vSync)
 {
     if (vSync)
@@ -42,54 +46,61 @@ bool Render_Init(bool vSync)
             SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "SDL_GL_SetSwapInterval: %s", SDL_GetError());
     }
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluOrtho2D(-1, 1, -1, 1);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    lastViewMode2D = viewMode2D;
 
     return true;
 }
 
 static void ResizeViewport(int32_t width, int32_t height)
 {
-    int minimum = 0;
-    bool heightIsMinimum = false;
-    if (width > height)
+    // Square letterboxing for 2D mode.
+    if (viewMode2D)
     {
-        minimum = height;
-        heightIsMinimum = true;
-    }
-    else
-    {
-        minimum = width;
-        heightIsMinimum = false;
-    }
+        int minimum = 0;
+        bool heightIsMinimum = false;
+        if (width > height)
+        {
+            minimum = height;
+            heightIsMinimum = true;
+        }
+        else
+        {
+            minimum = width;
+            heightIsMinimum = false;
+        }
 
-    int letterBoxWidth = 0;
-    if (heightIsMinimum)
-    {
-        letterBoxWidth = (width - height) / 2;
-        glViewport(letterBoxWidth, 0, minimum, minimum);
+        int letterBoxWidth = 0;
+        if (heightIsMinimum)
+        {
+            letterBoxWidth = (width - height) / 2;
+            glViewport(letterBoxWidth, 0, minimum, minimum);
+        }
+        else
+        {
+            letterBoxWidth = (height - width) / 2;
+            glViewport(0, letterBoxWidth, minimum, minimum);
+        }
     }
+    // Maximum viewport size for 3D mode.
     else
     {
-        letterBoxWidth = (height - width) / 2;
-        glViewport(0, letterBoxWidth, minimum, minimum);
+        glViewport(0, 0, width, height);
     }
 }
 
 
 static void ProcessEvent(SDL_Event *sdlEvent)
 {
+    int drawableWidth = 0;
+    int drawableHeight = 0;
     switch (sdlEvent->type)
     {
         case SDL_WINDOWEVENT:
             switch (sdlEvent->window.event)
             {
                 case SDL_WINDOWEVENT_RESIZED:
-                    ResizeViewport(sdlEvent->window.data1, sdlEvent->window.data2);
+                    SDL_GL_GetDrawableSize(sdlWindow, &drawableWidth, &drawableHeight);
+                    ResizeViewport(drawableWidth, drawableHeight);
                     break;
             }
             break;
@@ -104,6 +115,17 @@ void Render_Logic(uint32_t currentTick)
     SDL_Event *currentEvent;
     while (List_IteratorNext(listIterator, (void**)&currentEvent))
         ProcessEvent(currentEvent);
+
+    // Extra check for view mode change.
+    if (viewMode2D != lastViewMode2D)
+    {
+        lastViewMode2D = viewMode2D;
+
+        int drawableWidth = 0;
+        int drawableHeight = 0;
+        SDL_GL_GetDrawableSize(sdlWindow, &drawableWidth, &drawableHeight);
+        ResizeViewport(drawableWidth, drawableHeight);
+    }
 }
 
 
