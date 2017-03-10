@@ -29,54 +29,75 @@
 #include "nanosvg.h"
 
 
-#define PIECE_SVG_PAWN_DARK "svg/Chess_pdt45.svg"
-#define PIECE_SVG_ROOK_DARK "svg/Chess_rdt45.svg"
-#define PIECE_SVG_KNIGHT_DARK "svg/Chess_ndt45.svg"
-#define PIECE_SVG_BISHOP_DARK "svg/Chess_bdt45.svg"
-#define PIECE_SVG_QUEEN_DARK "svg/Chess_qdt45.svg"
-#define PIECE_SVG_KING_DARK "svg/Chess_kdt45.svg"
+#define ASSET_PATH_SVG_PAWN_DARK "svg/Chess_pdt45.svg"
+#define ASSET_PATH_SVG_ROOK_DARK "svg/Chess_rdt45.svg"
+#define ASSET_PATH_SVG_KNIGHT_DARK "svg/Chess_ndt45.svg"
+#define ASSET_PATH_SVG_BISHOP_DARK "svg/Chess_bdt45.svg"
+#define ASSET_PATH_SVG_QUEEN_DARK "svg/Chess_qdt45.svg"
+#define ASSET_PATH_SVG_KING_DARK "svg/Chess_kdt45.svg"
 
-#define PIECE_SVG_PAWN_LIGHT "svg/Chess_plt45.svg"
-#define PIECE_SVG_ROOK_LIGHT "svg/Chess_rlt45.svg"
-#define PIECE_SVG_KNIGHT_LIGHT "svg/Chess_nlt45.svg"
-#define PIECE_SVG_BISHOP_LIGHT "svg/Chess_blt45.svg"
-#define PIECE_SVG_QUEEN_LIGHT "svg/Chess_qlt45.svg"
-#define PIECE_SVG_KING_LIGHT "svg/Chess_klt45.svg"
+#define ASSET_PATH_SVG_PAWN_LIGHT "svg/Chess_plt45.svg"
+#define ASSET_PATH_SVG_ROOK_LIGHT "svg/Chess_rlt45.svg"
+#define ASSET_PATH_SVG_KNIGHT_LIGHT "svg/Chess_nlt45.svg"
+#define ASSET_PATH_SVG_BISHOP_LIGHT "svg/Chess_blt45.svg"
+#define ASSET_PATH_SVG_QUEEN_LIGHT "svg/Chess_qlt45.svg"
+#define ASSET_PATH_SVG_KING_LIGHT "svg/Chess_klt45.svg"
 
 
-#define PIECE_OBJ_PAWN "obj/pawn.obj"
-#define PIECE_OBJ_ROOK "obj/rook.obj"
-#define PIECE_OBJ_KNIGHT "obj/knight.obj"
-#define PIECE_OBJ_BISHOP "obj/bishop.obj"
-#define PIECE_OBJ_QUEEN "obj/queen.obj"
-#define PIECE_OBJ_KING "obj/king.obj"
+#define ASSET_PATH_OBJ_PAWN "obj/pawn.obj"
+#define ASSET_PATH_OBJ_ROOK "obj/rook.obj"
+#define ASSET_PATH_OBJ_KNIGHT "obj/knight.obj"
+#define ASSET_PATH_OBJ_BISHOP "obj/bishop.obj"
+#define ASSET_PATH_OBJ_QUEEN "obj/queen.obj"
+#define ASSET_PATH_OBJ_KING "obj/king.obj"
+#define ASSET_PATH_OBJ_BOARD "obj/board.obj"
 
-#define PIECE_OBJ_BOARD "obj/board.obj"
-#define PIECE_MTL_BOARD "mtl/board.mtl"
+#define ASSET_PATH_MTL_BOARD "mtl/board.mtl"
+
+
+const char *svgAssetPaths[] =
+{
+    ASSET_PATH_SVG_PAWN_DARK,
+    ASSET_PATH_SVG_ROOK_DARK,
+    ASSET_PATH_SVG_KNIGHT_DARK,
+    ASSET_PATH_SVG_BISHOP_DARK,
+    ASSET_PATH_SVG_QUEEN_DARK,
+    ASSET_PATH_SVG_KING_DARK,
+
+    ASSET_PATH_SVG_PAWN_LIGHT,
+    ASSET_PATH_SVG_ROOK_LIGHT,
+    ASSET_PATH_SVG_KNIGHT_LIGHT,
+    ASSET_PATH_SVG_BISHOP_LIGHT,
+    ASSET_PATH_SVG_QUEEN_LIGHT,
+    ASSET_PATH_SVG_KING_LIGHT
+};
+#define SVG_ASSET_PATH_COUNT 12
+
+const char *objAssetPaths[] =
+{
+    ASSET_PATH_OBJ_PAWN,
+    ASSET_PATH_OBJ_ROOK,
+    ASSET_PATH_OBJ_KNIGHT,
+    ASSET_PATH_OBJ_BISHOP,
+    ASSET_PATH_OBJ_QUEEN,
+    ASSET_PATH_OBJ_KING,
+    ASSET_PATH_OBJ_BOARD
+};
+#define OBJ_ASSET_PATH_COUNT 7
+
+const char *objMaterialPaths[] =
+{
+    ASSET_PATH_MTL_BOARD
+};
+#define OBJ_ASSET_MATERIAL_PATH_COUNT 1
+
 
 struct NSVGimage **svgAssets;
 
-tinyobj::attrib_t modelPawnAttrib;
-std::vector<tinyobj::shape_t> modelPawnShape;
+std::vector<tinyobj::attrib_t> *objAttributes;
+std::vector<std::vector<tinyobj::shape_t>> *objShapes;
+std::vector<std::vector<tinyobj::material_t>>  *objMaterials;
 
-tinyobj::attrib_t modelRookAttrib;
-std::vector<tinyobj::shape_t> modelRookShape;
-
-tinyobj::attrib_t modelKnightAttrib;
-std::vector<tinyobj::shape_t> modelKnightShape;
-
-tinyobj::attrib_t modelBishopAttrib;
-std::vector<tinyobj::shape_t> modelBishopShape;
-
-tinyobj::attrib_t modelQueenAttrib;
-std::vector<tinyobj::shape_t> modelQueenShape;
-
-tinyobj::attrib_t modelKingAttrib;
-std::vector<tinyobj::shape_t> modelKingShape;
-
-tinyobj::attrib_t modelBoardAttrib;
-std::vector<tinyobj::shape_t> modelBoardShape;
-std::vector<tinyobj::material_t> modelBoardMaterial;
 
 void ReadLinesAndCopy(std::shared_ptr<ZipArchiveEntry> archiveEntry, char **destination)
 {
@@ -98,92 +119,16 @@ bool LoadSVGAssets(std::shared_ptr<ZipArchive> archive)
 
     svgAssets = (NSVGimage**)malloc(SVG_ASSET_COUNT * sizeof(NSVGimage*));
 
-    // Dark Pieces
-    ZipArchiveEntry::Ptr archiveEntry = archive->GetEntry(PIECE_SVG_PAWN_DARK);
-    if (archiveEntry == nullptr)
-        return false;
-    ReadLinesAndCopy(archiveEntry, &currentText);
-    svgAssets[SVG_PAWN_DARK] = nsvgParse(currentText, "px", 96);
-    delete(currentText);
-
-    archiveEntry = archive->GetEntry(PIECE_SVG_ROOK_DARK);
-    if (archiveEntry == nullptr)
-        return false;
-    ReadLinesAndCopy(archiveEntry, &currentText);
-    svgAssets[SVG_ROOK_DARK]  = nsvgParse(currentText, "px", 96);
-    delete(currentText);
-
-    archiveEntry = archive->GetEntry(PIECE_SVG_KNIGHT_DARK);
-    if (archiveEntry == nullptr)
-        return false;
-    ReadLinesAndCopy(archiveEntry, &currentText);
-    svgAssets[SVG_KNIGHT_DARK]  = nsvgParse(currentText, "px", 96);
-    delete(currentText);
-
-    archiveEntry = archive->GetEntry(PIECE_SVG_BISHOP_DARK);
-    if (archiveEntry == nullptr)
-        return false;
-    ReadLinesAndCopy(archiveEntry, &currentText);
-    svgAssets[SVG_BISHOP_DARK]  = nsvgParse(currentText, "px", 96);
-    delete(currentText);
-
-    archiveEntry = archive->GetEntry(PIECE_SVG_QUEEN_DARK);
-    if (archiveEntry == nullptr)
-        return false;
-    ReadLinesAndCopy(archiveEntry, &currentText);
-    svgAssets[SVG_QUEEN_DARK]  = nsvgParse(currentText, "px", 96);
-    delete(currentText);
-
-    archiveEntry = archive->GetEntry(PIECE_SVG_KING_DARK);
-    if (archiveEntry == nullptr)
-        return false;
-    ReadLinesAndCopy(archiveEntry, &currentText);
-    svgAssets[SVG_KING_DARK]  = nsvgParse(currentText, "px", 96);
-    delete(currentText);
-
-
-    // Light Pieces
-    archiveEntry = archive->GetEntry(PIECE_SVG_PAWN_LIGHT);
-    if (archiveEntry == nullptr)
-        return false;
-    ReadLinesAndCopy(archiveEntry, &currentText);
-    svgAssets[SVG_PAWN_LIGHT]  = nsvgParse(currentText, "px", 96);
-    delete(currentText);
-
-    archiveEntry = archive->GetEntry(PIECE_SVG_ROOK_LIGHT);
-    if (archiveEntry == nullptr)
-        return false;
-    ReadLinesAndCopy(archiveEntry, &currentText);
-    svgAssets[SVG_ROOK_LIGHT]  = nsvgParse(currentText, "px", 96);
-    delete(currentText);
-
-    archiveEntry = archive->GetEntry(PIECE_SVG_KNIGHT_LIGHT);
-    if (archiveEntry == nullptr)
-        return false;
-    ReadLinesAndCopy(archiveEntry, &currentText);
-    svgAssets[SVG_KNIGHT_LIGHT]  = nsvgParse(currentText, "px", 96);
-    delete(currentText);
-
-    archiveEntry = archive->GetEntry(PIECE_SVG_BISHOP_LIGHT);
-    if (archiveEntry == nullptr)
-        return false;
-    ReadLinesAndCopy(archiveEntry, &currentText);
-    svgAssets[SVG_BISHOP_LIGHT]  = nsvgParse(currentText, "px", 96);
-    delete(currentText);
-
-    archiveEntry = archive->GetEntry(PIECE_SVG_QUEEN_LIGHT);
-    if (archiveEntry == nullptr)
-        return false;
-    ReadLinesAndCopy(archiveEntry, &currentText);
-    svgAssets[SVG_QUEEN_LIGHT]  = nsvgParse(currentText, "px", 96);
-    delete(currentText);
-
-    archiveEntry = archive->GetEntry(PIECE_SVG_KING_LIGHT);
-    if (archiveEntry == nullptr)
-        return false;
-    ReadLinesAndCopy(archiveEntry, &currentText);
-    svgAssets[SVG_KING_LIGHT]  = nsvgParse(currentText, "px", 96);
-    delete(currentText);
+    // Load SVGs
+    for (int i = 0; i < SVG_ASSET_PATH_COUNT; i++)
+    {
+        ZipArchiveEntry::Ptr archiveEntry = archive->GetEntry(svgAssetPaths[i]);
+        if (archiveEntry == nullptr)
+            return false;
+        ReadLinesAndCopy(archiveEntry, &currentText);
+        svgAssets[i] = nsvgParse(currentText, "px", 96);
+        delete(currentText);
+    }
 
     return true;
 }
@@ -195,86 +140,37 @@ bool LoadModelAssets(std::shared_ptr<ZipArchive> archive)
     std::vector<tinyobj::material_t> unusedMaterials;
     std::map<std::string, int> unusedMaterialMap;
 
-    ZipArchiveEntry::Ptr archiveEntry = archive->GetEntry(PIECE_OBJ_PAWN);
-    if (archiveEntry == nullptr)
-        return false;
-    if (!tinyobj::LoadObj(&modelPawnAttrib, &modelPawnShape, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+    objAttributes = new std::vector<tinyobj::attrib_t>(OBJ_ASSET_ATTRIB_COUNT);
+    objShapes = new std::vector<std::vector<tinyobj::shape_t>>(OBJ_ASSET_SHAPE_COUNT);
+    objMaterials = new std::vector<std::vector<tinyobj::material_t>>(OBJ_ASSET_MATERIAL_COUNT);
+
+    // Load Shapes
+    for (int i = 0; i < OBJ_ASSET_PATH_COUNT; i++)
     {
-        if (error.length() > 0)
-            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
-        return false;
+        ZipArchiveEntry::Ptr archiveEntry = archive->GetEntry(objAssetPaths[i]);
+        if (archiveEntry == nullptr)
+            return false;
+        if (!tinyobj::LoadObj(&(objAttributes->at(i)), &(objShapes->at(i)), &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+        {
+            if (error.length() > 0)
+                SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+            return false;
+        }
     }
 
-    archiveEntry = archive->GetEntry(PIECE_OBJ_ROOK);
-    if (archiveEntry == nullptr)
-        return false;
-    if (!tinyobj::LoadObj(&modelRookAttrib, &modelRookShape, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
+    // Load Materials
+    for (int i = 0; i < OBJ_ASSET_MATERIAL_COUNT; i++)
     {
-        if (error.length() > 0)
-            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
-        return false;
+        ZipArchiveEntry::Ptr archiveEntry = archive->GetEntry(objMaterialPaths[i]);
+        if (archiveEntry == nullptr)
+        {
+            if (error.length() > 0)
+                SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
+            return false;
+        }
+
+        tinyobj::LoadMtl(&unusedMaterialMap, &(objMaterials->at(i)), archiveEntry->GetDecompressionStream(), &error);
     }
-
-    archiveEntry = archive->GetEntry(PIECE_OBJ_KNIGHT);
-    if (archiveEntry == nullptr)
-        return false;
-    if (!tinyobj::LoadObj(&modelKnightAttrib, &modelKnightShape, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
-    {
-        if (error.length() > 0)
-            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
-        return false;
-    }
-
-    archiveEntry = archive->GetEntry(PIECE_OBJ_BISHOP);
-    if (archiveEntry == nullptr)
-        return false;
-    if (!tinyobj::LoadObj(&modelBishopAttrib, &modelBishopShape, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
-    {
-        if (error.length() > 0)
-            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
-        return false;
-    }
-
-    archiveEntry = archive->GetEntry(PIECE_OBJ_QUEEN);
-    if (archiveEntry == nullptr)
-        return false;
-    if (!tinyobj::LoadObj(&modelQueenAttrib, &modelQueenShape, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
-    {
-        if (error.length() > 0)
-            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
-        return false;
-    }
-
-    archiveEntry = archive->GetEntry(PIECE_OBJ_KING);
-    if (archiveEntry == nullptr)
-        return false;
-    if (!tinyobj::LoadObj(&modelKingAttrib, &modelKingShape, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
-    {
-        if (error.length() > 0)
-            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
-        return false;
-    }
-
-    archiveEntry = archive->GetEntry(PIECE_OBJ_BOARD);
-    if (archiveEntry == nullptr)
-        return false;
-    if (!tinyobj::LoadObj(&modelBoardAttrib, &modelBoardShape, &unusedMaterials, &error, archiveEntry->GetDecompressionStream()))
-    {
-        if (error.length() > 0)
-            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
-        return false;
-    }
-
-    archiveEntry = archive->GetEntry(PIECE_MTL_BOARD);
-    if (archiveEntry == nullptr)
-    {
-        if (error.length() > 0)
-            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
-        return false;
-    }
-
-    tinyobj::LoadMtl(&unusedMaterialMap, &modelBoardMaterial, archiveEntry->GetDecompressionStream(), &error);
-
 
     return true;
 }

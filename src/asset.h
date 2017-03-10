@@ -25,7 +25,7 @@
 #include "nanosvg.h"
 #include "tiny_obj_loader.h"
 
-typedef enum SVGAssetType
+typedef enum SVGAssetIndex
 {
     SVG_PAWN_DARK,
     SVG_ROOK_DARK,
@@ -40,30 +40,41 @@ typedef enum SVGAssetType
     SVG_QUEEN_LIGHT,
     SVG_KING_LIGHT,
     SVG_ASSET_COUNT
-} SVGAssetEnum;
+} SVGAssetIndex;
 extern struct NSVGimage **svgAssets;
 
-extern tinyobj::attrib_t modelPawnAttrib;
-extern std::vector<tinyobj::shape_t> modelPawnShape;
+typedef enum OBJAssetAttribIndex
+{
+    OBJ_PAWN_ATTRIB,
+    OBJ_ROOK_ATTRIB,
+    OBJ_KNIGHT_ATTRIB,
+    OBJ_BISHOP_ATTRIB,
+    OBJ_QUEEN_ATTRIB,
+    OBJ_KING_ATTRIB,
+    OBJ_BOARD_ATTRIB,
+    OBJ_ASSET_ATTRIB_COUNT
+} OBJAssetAttribIndex;
+extern std::vector<tinyobj::attrib_t> *objAttributes;
 
-extern tinyobj::attrib_t modelRookAttrib;
-extern std::vector<tinyobj::shape_t> modelRookShape;
+typedef enum OBJAssetShapeIndex
+{
+    OBJ_PAWN_SHAPE,
+    OBJ_ROOK_SHAPE,
+    OBJ_KNIGHT_SHAPE,
+    OBJ_BISHOP_SHAPE,
+    OBJ_QUEEN_SHAPE,
+    OBJ_KING_SHAPE,
+    OBJ_BOARD_SHAPE,
+    OBJ_ASSET_SHAPE_COUNT
+} OBJAssetShapeIndex;
+extern std::vector<std::vector<tinyobj::shape_t>> *objShapes;
 
-extern tinyobj::attrib_t modelKnightAttrib;
-extern std::vector<tinyobj::shape_t> modelKnightShape;
-
-extern tinyobj::attrib_t modelBishopAttrib;
-extern std::vector<tinyobj::shape_t> modelBishopShape;
-
-extern tinyobj::attrib_t modelQueenAttrib;
-extern std::vector<tinyobj::shape_t> modelQueenShape;
-
-extern tinyobj::attrib_t modelKingAttrib;
-extern std::vector<tinyobj::shape_t> modelKingShape;
-
-extern tinyobj::attrib_t modelBoardAttrib;
-extern std::vector<tinyobj::shape_t> modelBoardShape;
-extern std::vector<tinyobj::material_t> modelBoardMaterial;
+typedef enum OBJAssetMaterialIndex
+{
+    OBJ_BOARD_MATERIAL,
+    OBJ_ASSET_MATERIAL_COUNT
+} OBJAssetMaterialIndex;
+extern std::vector<std::vector<tinyobj::material_t>> *objMaterials;
 
 bool Asset_Init(void);
 void Asset_Quit(void);
