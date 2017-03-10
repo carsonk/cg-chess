@@ -214,4 +214,8 @@ void Asset_Quit(void)
     nsvgDelete(svgAssets[SVG_KING_LIGHT]);
 
     free(svgAssets);
+
+    delete objAttributes;
+    delete objShapes;
+    delete objMaterials;
 }
