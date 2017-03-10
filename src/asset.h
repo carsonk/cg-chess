@@ -25,19 +25,23 @@
 #include "nanosvg.h"
 #include "tiny_obj_loader.h"
 
-extern struct NSVGimage *svgPawnDark;
-extern struct NSVGimage *svgRookDark;
-extern struct NSVGimage *svgKnightDark;
-extern struct NSVGimage *svgBishopDark;
-extern struct NSVGimage *svgQueenDark;
-extern struct NSVGimage *svgKingDark;
-
-extern struct NSVGimage *svgPawnLight;
-extern struct NSVGimage *svgRookLight;
-extern struct NSVGimage *svgKnightLight;
-extern struct NSVGimage *svgBishopLight;
-extern struct NSVGimage *svgQueenLight;
-extern struct NSVGimage *svgKingLight;
+typedef enum SVGAssetType
+{
+    SVG_PAWN_DARK,
+    SVG_ROOK_DARK,
+    SVG_KNIGHT_DARK,
+    SVG_BISHOP_DARK,
+    SVG_QUEEN_DARK,
+    SVG_KING_DARK,
+    SVG_PAWN_LIGHT,
+    SVG_ROOK_LIGHT,
+    SVG_KNIGHT_LIGHT,
+    SVG_BISHOP_LIGHT,
+    SVG_QUEEN_LIGHT,
+    SVG_KING_LIGHT,
+    SVG_ASSET_COUNT
+} SVGAssetEnum;
+extern struct NSVGimage **svgAssets;
 
 extern tinyobj::attrib_t modelPawnAttrib;
 extern std::vector<tinyobj::shape_t> modelPawnShape;

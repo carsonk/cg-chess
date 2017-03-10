@@ -54,19 +54,7 @@
 #define PIECE_OBJ_BOARD "obj/board.obj"
 #define PIECE_MTL_BOARD "mtl/board.mtl"
 
-struct NSVGimage *svgPawnDark;
-struct NSVGimage *svgRookDark;
-struct NSVGimage *svgKnightDark;
-struct NSVGimage *svgBishopDark;
-struct NSVGimage *svgQueenDark;
-struct NSVGimage *svgKingDark;
-
-struct NSVGimage *svgPawnLight;
-struct NSVGimage *svgRookLight;
-struct NSVGimage *svgKnightLight;
-struct NSVGimage *svgBishopLight;
-struct NSVGimage *svgQueenLight;
-struct NSVGimage *svgKingLight;
+struct NSVGimage **svgAssets;
 
 tinyobj::attrib_t modelPawnAttrib;
 std::vector<tinyobj::shape_t> modelPawnShape;
@@ -108,47 +96,49 @@ bool LoadSVGAssets(std::shared_ptr<ZipArchive> archive)
 {
     char *currentText = NULL;
 
+    svgAssets = (NSVGimage**)malloc(SVG_ASSET_COUNT * sizeof(NSVGimage*));
+
     // Dark Pieces
     ZipArchiveEntry::Ptr archiveEntry = archive->GetEntry(PIECE_SVG_PAWN_DARK);
     if (archiveEntry == nullptr)
         return false;
     ReadLinesAndCopy(archiveEntry, &currentText);
-    svgPawnDark = nsvgParse(currentText, "px", 96);
+    svgAssets[SVG_PAWN_DARK] = nsvgParse(currentText, "px", 96);
     delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_ROOK_DARK);
     if (archiveEntry == nullptr)
         return false;
     ReadLinesAndCopy(archiveEntry, &currentText);
-    svgRookDark = nsvgParse(currentText, "px", 96);
+    svgAssets[SVG_ROOK_DARK]  = nsvgParse(currentText, "px", 96);
     delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_KNIGHT_DARK);
     if (archiveEntry == nullptr)
         return false;
     ReadLinesAndCopy(archiveEntry, &currentText);
-    svgKnightDark = nsvgParse(currentText, "px", 96);
+    svgAssets[SVG_KNIGHT_DARK]  = nsvgParse(currentText, "px", 96);
     delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_BISHOP_DARK);
     if (archiveEntry == nullptr)
         return false;
     ReadLinesAndCopy(archiveEntry, &currentText);
-    svgBishopDark = nsvgParse(currentText, "px", 96);
+    svgAssets[SVG_BISHOP_DARK]  = nsvgParse(currentText, "px", 96);
     delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_QUEEN_DARK);
     if (archiveEntry == nullptr)
         return false;
     ReadLinesAndCopy(archiveEntry, &currentText);
-    svgQueenDark = nsvgParse(currentText, "px", 96);
+    svgAssets[SVG_QUEEN_DARK]  = nsvgParse(currentText, "px", 96);
     delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_KING_DARK);
     if (archiveEntry == nullptr)
         return false;
     ReadLinesAndCopy(archiveEntry, &currentText);
-    svgKingDark = nsvgParse(currentText, "px", 96);
+    svgAssets[SVG_KING_DARK]  = nsvgParse(currentText, "px", 96);
     delete(currentText);
 
 
@@ -157,42 +147,42 @@ bool LoadSVGAssets(std::shared_ptr<ZipArchive> archive)
     if (archiveEntry == nullptr)
         return false;
     ReadLinesAndCopy(archiveEntry, &currentText);
-    svgPawnLight = nsvgParse(currentText, "px", 96);
+    svgAssets[SVG_PAWN_LIGHT]  = nsvgParse(currentText, "px", 96);
     delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_ROOK_LIGHT);
     if (archiveEntry == nullptr)
         return false;
     ReadLinesAndCopy(archiveEntry, &currentText);
-    svgRookLight = nsvgParse(currentText, "px", 96);
+    svgAssets[SVG_ROOK_LIGHT]  = nsvgParse(currentText, "px", 96);
     delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_KNIGHT_LIGHT);
     if (archiveEntry == nullptr)
         return false;
     ReadLinesAndCopy(archiveEntry, &currentText);
-    svgKnightLight = nsvgParse(currentText, "px", 96);
+    svgAssets[SVG_KNIGHT_LIGHT]  = nsvgParse(currentText, "px", 96);
     delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_BISHOP_LIGHT);
     if (archiveEntry == nullptr)
         return false;
     ReadLinesAndCopy(archiveEntry, &currentText);
-    svgBishopLight = nsvgParse(currentText, "px", 96);
+    svgAssets[SVG_BISHOP_LIGHT]  = nsvgParse(currentText, "px", 96);
     delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_QUEEN_LIGHT);
     if (archiveEntry == nullptr)
         return false;
     ReadLinesAndCopy(archiveEntry, &currentText);
-    svgQueenLight = nsvgParse(currentText, "px", 96);
+    svgAssets[SVG_QUEEN_LIGHT]  = nsvgParse(currentText, "px", 96);
     delete(currentText);
 
     archiveEntry = archive->GetEntry(PIECE_SVG_KING_LIGHT);
     if (archiveEntry == nullptr)
         return false;
     ReadLinesAndCopy(archiveEntry, &currentText);
-    svgKingLight = nsvgParse(currentText, "px", 96);
+    svgAssets[SVG_KING_LIGHT]  = nsvgParse(currentText, "px", 96);
     delete(currentText);
 
     return true;
@@ -276,7 +266,7 @@ bool LoadModelAssets(std::shared_ptr<ZipArchive> archive)
     }
 
     archiveEntry = archive->GetEntry(PIECE_MTL_BOARD);
-    if (archiveEntry == nullptr) 
+    if (archiveEntry == nullptr)
     {
         if (error.length() > 0)
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Asset_Init: LoadModelAssets: %s", error.c_str());
@@ -313,17 +303,19 @@ bool Asset_Init(void)
 
 void Asset_Quit(void)
 {
-    nsvgDelete(svgPawnDark);
-    nsvgDelete(svgRookDark);
-    nsvgDelete(svgKnightDark);
-    nsvgDelete(svgBishopDark);
-    nsvgDelete(svgQueenDark);
-    nsvgDelete(svgKingDark);
+    nsvgDelete(svgAssets[SVG_PAWN_DARK]);
+    nsvgDelete(svgAssets[SVG_ROOK_DARK]);
+    nsvgDelete(svgAssets[SVG_KNIGHT_DARK]);
+    nsvgDelete(svgAssets[SVG_BISHOP_DARK]);
+    nsvgDelete(svgAssets[SVG_QUEEN_DARK]);
+    nsvgDelete(svgAssets[SVG_KING_DARK]);
 
-    nsvgDelete(svgPawnLight);
-    nsvgDelete(svgRookLight);
-    nsvgDelete(svgKnightLight);
-    nsvgDelete(svgBishopLight);
-    nsvgDelete(svgQueenLight);
-    nsvgDelete(svgKingLight);
+    nsvgDelete(svgAssets[SVG_PAWN_LIGHT]);
+    nsvgDelete(svgAssets[SVG_ROOK_LIGHT]);
+    nsvgDelete(svgAssets[SVG_KNIGHT_LIGHT]);
+    nsvgDelete(svgAssets[SVG_BISHOP_LIGHT]);
+    nsvgDelete(svgAssets[SVG_QUEEN_LIGHT]);
+    nsvgDelete(svgAssets[SVG_KING_LIGHT]);
+
+    free(svgAssets);
 }
