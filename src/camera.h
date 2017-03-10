@@ -23,6 +23,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+extern bool viewMode2D;
+extern bool Camera_ViewToModelView(void);
+bool Camera_ReloadProjection(void);
 bool Camera_Init(void);
 void Camera_Logic(uint32_t currentTick);
 void Camera_Quit(void);
