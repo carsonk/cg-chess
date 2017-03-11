@@ -32,5 +32,5 @@ extern void *sdlEventBuffer;
 // Globally accessible SDL window that represents the game window.
 extern SDL_Window *sdlWindow;
 
-// Globally accessible OpenGL context that represents the game OpenGL context.
-extern SDL_GLContext sdlGLContext;
+// Globally accessible SDL renderer context.
+extern SDL_Renderer *sdlRenderer;

@@ -21,70 +21,57 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include "camera.h"
 #include "list.h"
 #include "main.h"
 #include "render.h"
 #include "SDL.h"
 
-// Must include Windows header prior to including OpenGL header.
-#ifdef _WIN32
-#include <Windows.h>
-#endif
-#include <gl/GL.h>
-#include <gl/GLU.h>
 
+static int viewportDimension;
 
-static bool lastViewMode2D;
-
-
-bool Render_Init(bool vSync)
+bool Render_Init()
 {
-    if (vSync)
-    {
-        if (SDL_GL_SetSwapInterval(1) != 0)
-            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "SDL_GL_SetSwapInterval: %s", SDL_GetError());
-    }
+    SDL_Rect viewport;
+    SDL_RenderGetViewport(sdlRenderer, &viewport);
 
-    lastViewMode2D = viewMode2D;
+    if (viewport.w < viewport.h)
+        viewportDimension = viewport.w;
+    else
+        viewportDimension = viewport.h;
 
     return true;
 }
 
 static void ResizeViewport(int32_t width, int32_t height)
 {
-    // Square letterboxing for 2D mode.
-    if (viewMode2D)
+    int minimum = 0;
+    bool heightIsMinimum = false;
+    if (width > height)
     {
-        int minimum = 0;
-        bool heightIsMinimum = false;
-        if (width > height)
-        {
-            minimum = height;
-            heightIsMinimum = true;
-        }
-        else
-        {
-            minimum = width;
-            heightIsMinimum = false;
-        }
-
-        int letterBoxWidth = 0;
-        if (heightIsMinimum)
-        {
-            letterBoxWidth = (width - height) / 2;
-            glViewport(letterBoxWidth, 0, minimum, minimum);
-        }
-        else
-        {
-            letterBoxWidth = (height - width) / 2;
-            glViewport(0, letterBoxWidth, minimum, minimum);
-        }
+        minimum = height;
+        heightIsMinimum = true;
     }
-    // Maximum viewport size for 3D mode.
     else
     {
-        glViewport(0, 0, width, height);
+        minimum = width;
+        heightIsMinimum = false;
+    }
+
+    viewportDimension = minimum;
+
+    int letterBoxWidth = 0;
+    if (heightIsMinimum)
+    {
+        letterBoxWidth = (width - height) / 2;
+
+        SDL_Rect newViewport = { letterBoxWidth, 0, minimum, minimum };
+        SDL_RenderSetViewport(sdlRenderer, &newViewport);
+    }
+    else
+    {
+        letterBoxWidth = (height - width) / 2;
+        SDL_Rect newViewport = { 0, letterBoxWidth, minimum, minimum };
+        SDL_RenderSetViewport(sdlRenderer, &newViewport);
     }
 }
 
@@ -115,17 +102,6 @@ void Render_Logic(uint32_t currentTick)
     SDL_Event *currentEvent;
     while (List_IteratorNext(listIterator, (void**)&currentEvent))
         ProcessEvent(currentEvent);
-
-    // Extra check for view mode change.
-    if (viewMode2D != lastViewMode2D)
-    {
-        lastViewMode2D = viewMode2D;
-
-        int drawableWidth = 0;
-        int drawableHeight = 0;
-        SDL_GL_GetDrawableSize(sdlWindow, &drawableWidth, &drawableHeight);
-        ResizeViewport(drawableWidth, drawableHeight);
-    }
 }
 
 
@@ -136,29 +112,25 @@ void Render_Quit(void)
 
 void Render_Draw(uint32_t currentTick, double interpolation)
 {
-    glClearColor(0.25f, 0.25f, 0.25f, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
+    SDL_SetRenderDrawColor(sdlRenderer, 64, 64, 64, 64);
+    SDL_RenderClear(sdlRenderer);
 
     bool lightChecker = true;
-    float y = 1.0f;
+    float y = 0;
+    float xInc = viewportDimension / 8.0f;
+    float yInc = viewportDimension / 8.0f;
     for (int row = 0; row < 8; row++)
     {
-        float x = -1.0f;
+        float x = 0;
         for (int col = 0; col < 8; col++)
         {
             if (lightChecker)
-                glColor3f(255 / 255.0f, 206 / 255.0f, 158 / 255.0f);
+                SDL_SetRenderDrawColor(sdlRenderer, 255, 206, 158, 255);
             else
-                glColor3f(209 / 255.0f, 139 / 255.0f, 71 / 255.0f);
-
-            glBegin(GL_QUADS);
-            glVertex2f(x, y);
-            glVertex2f(x + 0.25f, y);
-            glVertex2f(x + 0.25f, y - 0.25f);
-            glVertex2f(x, y - 0.25f);
-            glEnd();
-
-            x += 0.25f;
+                SDL_SetRenderDrawColor(sdlRenderer, 209, 139, 71, 255);
+            SDL_Rect checker = { x, y, x + xInc, y + yInc };
+            SDL_RenderFillRect(sdlRenderer, &checker);
+            x += xInc;
 
             if (lightChecker)
                 lightChecker = false;
@@ -171,10 +143,8 @@ void Render_Draw(uint32_t currentTick, double interpolation)
         else
             lightChecker = true;
 
-        y -= 0.25f;
+        y += yInc;
     }
 
-    glFlush();
-
-    SDL_GL_SwapWindow(sdlWindow);
+    SDL_RenderPresent(sdlRenderer);
 }

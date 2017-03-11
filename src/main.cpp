@@ -39,11 +39,13 @@
 #define TICKS_PER_SECOND (60)
 #define MS_PER_TICK (1000 / TICKS_PER_SECOND)
 
+#define FIRST_AVAILABLE_DEVICE (-1)
+
 
 bool isRunning = false;
 void *sdlEventBuffer = NULL;
 SDL_Window *sdlWindow = NULL;
-SDL_GLContext sdlGLContext;
+SDL_Renderer *sdlRenderer;
 
 
 static void DoInput(uint32_t currentTick)
@@ -97,7 +99,7 @@ int main(int argc, char *argv[])
 
     // Create an SDL window.
     sdlWindow = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                                WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+                                WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT, SDL_WINDOW_RESIZABLE);
     // Check if window was created successfully.
     if (sdlWindow == NULL)
     {
@@ -105,11 +107,11 @@ int main(int argc, char *argv[])
         goto cleanup;
     }
 
-    // Create an OpenGL context.
-    sdlGLContext = SDL_GL_CreateContext(sdlWindow);
-    if (sdlGLContext == NULL)
+    // Create an SDL renderer context.
+    sdlRenderer = SDL_CreateRenderer(sdlWindow, FIRST_AVAILABLE_DEVICE, SDL_RENDERER_PRESENTVSYNC);
+    if (sdlRenderer == NULL)
     {
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL_GL_CreateContext", SDL_GetError(), NULL);
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL_CreateRenderer", SDL_GetError(), NULL);
         goto cleanup;
     }
 
@@ -145,7 +147,7 @@ int main(int argc, char *argv[])
     }
 
     // Render Subsystem
-    if (!Render_Init(true))
+    if (!Render_Init())
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Render_Init", "Failed to initialize render subsystem.", NULL);
         goto cleanup;
@@ -238,8 +240,8 @@ cleanup:
     Input_Quit();
     Asset_Quit();
 
-    if (sdlGLContext)
-        SDL_GL_DeleteContext(sdlGLContext);
+    if (sdlRenderer)
+        SDL_DestroyRenderer(sdlRenderer);
 
     if (sdlWindow)
         SDL_DestroyWindow(sdlWindow);

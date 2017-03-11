@@ -30,7 +30,7 @@ typedef enum RenderType
     RENDERTYPE_2D_VECTOR
 } RenderType;
 
-bool Render_Init(bool vSync);
+bool Render_Init(void);
 void Render_Logic(uint32_t currentTick);
 void Render_Quit(void);
 
