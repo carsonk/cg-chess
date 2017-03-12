@@ -25,6 +25,11 @@
 #include "SDL.h"
 
 
+extern bool userClickedTileLastFrame;
+extern int lastFrameClickedRank;
+extern int lastFrameClickedFile;
+
+
 bool Render_Init(void);
 void Render_Logic(uint32_t currentTick);
 void Render_Quit(void);

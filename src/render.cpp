@@ -53,7 +53,24 @@ typedef enum PieceTextureIndex
 static SDL_Texture *pieceTextures[12];
 static int svgDimension = 0;
 
+static int viewportOriginX;
+static int viewportOriginY;
 static int viewportDimension;
+
+bool userClickedTileLastFrame;
+int lastFrameClickedRank;
+int lastFrameClickedFile;
+
+void GetTileAt(int x, int y, int *rank, int *file)
+{
+    int dimension = viewportDimension / 8.0f;
+
+    if (rank != NULL)
+        *rank = (NUM_RANKS - 1) - ((y - viewportOriginY) / dimension);
+
+    if (file != NULL)
+        *file = ((x - viewportOriginX) / dimension);
+}
 
 
 void DestroySVGTextures(void)
@@ -139,12 +156,16 @@ static void ResizeViewport(int32_t width, int32_t height)
 
         SDL_Rect newViewport = { letterBoxWidth, 0, minimum, minimum };
         SDL_RenderSetViewport(sdlRenderer, &newViewport);
+
+        viewportOriginX = letterBoxWidth;
     }
     else
     {
         letterBoxWidth = (height - width) / 2;
         SDL_Rect newViewport = { 0, letterBoxWidth, minimum, minimum };
         SDL_RenderSetViewport(sdlRenderer, &newViewport);
+
+        viewportOriginY = letterBoxWidth;
     }
 }
 
@@ -156,15 +177,26 @@ static void ProcessEvent(SDL_Event *sdlEvent)
     switch (sdlEvent->type)
     {
         case SDL_WINDOWEVENT:
+        {
             switch (sdlEvent->window.event)
             {
-                case SDL_WINDOWEVENT_RESIZED:
-                    SDL_GL_GetDrawableSize(sdlWindow, &drawableWidth, &drawableHeight);
-                    ResizeViewport(drawableWidth, drawableHeight);
-                    RasterizeSVGTextures(viewportDimension / 8.0f);
-                    break;
+            case SDL_WINDOWEVENT_RESIZED:
+                SDL_GL_GetDrawableSize(sdlWindow, &drawableWidth, &drawableHeight);
+                ResizeViewport(drawableWidth, drawableHeight);
+                RasterizeSVGTextures(viewportDimension / 8.0f);
+                break;
             }
             break;
+        }
+        case SDL_MOUSEBUTTONDOWN:
+        {
+            if (sdlEvent->button.button == SDL_BUTTON_LEFT && sdlEvent->button.clicks == 1)
+            {
+                userClickedTileLastFrame = true;
+                GetTileAt(sdlEvent->button.x, sdlEvent->button.y, &lastFrameClickedRank, &lastFrameClickedFile);
+            }
+            break;
+        }
     }
 }
 
@@ -172,6 +204,8 @@ static void ProcessEvent(SDL_Event *sdlEvent)
 void Render_Logic(uint32_t currentTick)
 {
     void *listIterator = List_IteratorCreate(sdlEventBuffer);
+
+    userClickedTileLastFrame = false;
 
     SDL_Event *currentEvent;
     while (List_IteratorNext(listIterator, (void**)&currentEvent))
