@@ -22,7 +22,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "SDL.h"
 
 
 extern bool userClickedTileLastFrame;
