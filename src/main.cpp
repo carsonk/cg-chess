@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 
     // Create an SDL window.
     sdlWindow = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                                WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT, SDL_WINDOW_RESIZABLE);
+                                360, 360, 0);
     // Check if window was created successfully.
     if (sdlWindow == NULL)
     {

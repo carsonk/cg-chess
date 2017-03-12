@@ -206,7 +206,8 @@ void Render_Draw(uint32_t currentTick, double interpolation)
                 SDL_SetRenderDrawColor(sdlRenderer, 209, 139, 71, 255);
             SDL_Rect checker = { x, y, xInc, yInc };
             SDL_RenderFillRect(sdlRenderer, &checker);
-            SDL_Rect piece = { x + (xInc / 8), y + (yInc / 8), xInc, yInc };
+            //SDL_Rect piece = { x + (xInc / 8), y + (yInc / 8), xInc, yInc };
+            SDL_Rect piece = checker;
 
             switch (boardState.pieces[file][rank])
             {
