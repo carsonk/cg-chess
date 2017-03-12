@@ -24,11 +24,6 @@
 #include <stdint.h>
 #include "SDL.h"
 
-typedef enum RenderType
-{
-    RENDERTYPE_NONE,
-    RENDERTYPE_2D_VECTOR
-} RenderType;
 
 bool Render_Init(void);
 void Render_Logic(uint32_t currentTick);
