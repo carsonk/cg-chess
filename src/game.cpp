@@ -33,6 +33,7 @@ BOARD_STATE boardState = {};
 GAME_STATUS gameStatus = GSTATUS_NOCHANGE;
 
 BOARD_STATE getEmptyBoard(void);
+void refreshBoardState(Position *newPosition);
 
 Square fromSquare = SQ_NONE;
 
@@ -104,6 +105,9 @@ void Game_Logic(uint32_t currentTick)
                 gameStatus = GSTATUS_MOVE_SUCCESS_CHECK;
 
             currentPosition.do_move(moveAttempt, st);
+
+            // Refresh our board state.
+            refreshBoardState(&currentPosition);
 
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Move performed.", square);
         } else {
@@ -185,4 +189,55 @@ BOARD_STATE getEmptyBoard(void) {
     }
 
     return freshBoard;
+}
+
+void refreshBoardState(Position *newPosition) {
+    for (int rank = 0; rank < NUM_RANKS; rank++) {
+        for (int file = 0; file < NUM_FILES; file++) {
+            GAME_PIECE piece = PIECE_EMPTY;
+            switch (newPosition->piece_on(make_square((File)file, (Rank)rank))) {
+            case NO_PIECE:
+                piece = PIECE_EMPTY;
+                break;
+            case W_PAWN:
+                piece = PIECE_PAWN;
+                break;
+            case W_KNIGHT:
+                piece = PIECE_KNIGHT;
+                break;
+            case W_BISHOP:
+                piece = PIECE_BISHOP;
+                break;
+            case W_ROOK:
+                piece = PIECE_ROOK;
+                break;
+            case W_QUEEN:
+                piece = PIECE_QUEEN;
+                break;
+            case W_KING:
+                piece = PIECE_KING;
+                break;
+            case B_PAWN:
+                piece = PIECE_BPAWN;
+                break;
+            case B_KNIGHT:
+                piece = PIECE_BKNIGHT;
+                break;
+            case B_BISHOP:
+                piece = PIECE_BBISHOP;
+                break;
+            case B_ROOK:
+                piece = PIECE_BROOK;
+                break;
+            case B_QUEEN:
+                piece = PIECE_BQUEEN;
+                break;
+            case B_KING:
+                piece = PIECE_BKING;
+                break;
+            }
+
+            boardState.pieces[rank][file] = piece;
+        }
+    }
 }
