@@ -243,7 +243,7 @@ void Render_Draw(uint32_t currentTick, double interpolation)
             //SDL_Rect piece = { x + (xInc / 8), y + (yInc / 8), xInc, yInc };
             SDL_Rect piece = checker;
 
-            switch (boardState.pieces[file][rank])
+            switch (boardState.pieces[(NUM_RANKS - 1) - rank][file])
             {
             case PIECE_PAWN:
                 SDL_RenderCopy(sdlRenderer, pieceTextures[LIGHT_PAWN_TEXTURE], NULL, &piece);
