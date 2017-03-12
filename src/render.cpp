@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "asset.h"
+#include "game.h"
 #include "list.h"
 #include "main.h"
 #include "render.h"
@@ -35,18 +36,18 @@ static NSVGrasterizer *svgRasterizerContext;
 
 typedef enum PieceTextureIndex
 {
-    BLACK_PAWN_TEXTURE,
-    BLACK_ROOK_TEXTURE,
-    BLACK_KNIGHT_TEXTURE,
-    BLACK_BISHOP_TEXTURE,
-    BLACK_QUEEN_TEXTURE,
-    BLACK_KING_TEXTURE,
-    WHITE_PAWN_TEXTURE,
-    WHITE_ROOK_TEXTURE,
-    WHITE_KNIGHT_TEXTURE,
-    WHITE_BISHOP_TEXTURE,
-    WHITE_QUEEN_TEXTURE,
-    WHITE_KING_TEXTURE,
+    DARK_PAWN_TEXTURE,
+    DARK_ROOK_TEXTURE,
+    DARK_KNIGHT_TEXTURE,
+    DARK_BISHOP_TEXTURE,
+    DARK_QUEEN_TEXTURE,
+    DARK_KING_TEXTURE,
+    LIGHT_PAWN_TEXTURE,
+    LIGHT_ROOK_TEXTURE,
+    LIGHT_KNIGHT_TEXTURE,
+    LIGHT_BISHOP_TEXTURE,
+    LIGHT_QUEEN_TEXTURE,
+    LIGHT_KING_TEXTURE,
     PIECE_TEXTURE_COUNT
 } PieceTextureIndex;
 static SDL_Texture *pieceTextures[12];
@@ -194,10 +195,10 @@ void Render_Draw(uint32_t currentTick, double interpolation)
     int y = 0;
     int xInc = viewportDimension / 8.0f;
     int yInc = viewportDimension / 8.0f;
-    for (int row = 0; row < 8; row++)
+    for (int rank = 0; rank < NUM_RANKS; rank++)
     {
         float x = 0;
-        for (int col = 0; col < 8; col++)
+        for (int file = 0; file < NUM_FILES; file++)
         {
             if (lightChecker)
                 SDL_SetRenderDrawColor(sdlRenderer, 255, 206, 158, 255);
@@ -206,7 +207,47 @@ void Render_Draw(uint32_t currentTick, double interpolation)
             SDL_Rect checker = { x, y, xInc, yInc };
             SDL_RenderFillRect(sdlRenderer, &checker);
             SDL_Rect piece = { x + (xInc / 8), y + (yInc / 8), xInc, yInc };
-            SDL_RenderCopy(sdlRenderer, pieceTextures[0], NULL, &piece);
+
+            switch (boardState.pieces[file][rank])
+            {
+            case PIECE_PAWN:
+                SDL_RenderCopy(sdlRenderer, pieceTextures[LIGHT_PAWN_TEXTURE], NULL, &piece);
+                break;
+            case PIECE_ROOK:
+                SDL_RenderCopy(sdlRenderer, pieceTextures[LIGHT_ROOK_TEXTURE], NULL, &piece);
+                break;
+            case PIECE_KNIGHT:
+                SDL_RenderCopy(sdlRenderer, pieceTextures[LIGHT_KNIGHT_TEXTURE], NULL, &piece);
+                break;
+            case PIECE_BISHOP:
+                SDL_RenderCopy(sdlRenderer, pieceTextures[LIGHT_BISHOP_TEXTURE], NULL, &piece);
+                break;
+            case PIECE_QUEEN:
+                SDL_RenderCopy(sdlRenderer, pieceTextures[LIGHT_QUEEN_TEXTURE], NULL, &piece);
+                break;
+            case PIECE_KING:
+                SDL_RenderCopy(sdlRenderer, pieceTextures[LIGHT_KING_TEXTURE], NULL, &piece);
+                break;
+
+            case PIECE_BPAWN:
+                SDL_RenderCopy(sdlRenderer, pieceTextures[DARK_PAWN_TEXTURE], NULL, &piece);
+                break;
+            case PIECE_BROOK:
+                SDL_RenderCopy(sdlRenderer, pieceTextures[DARK_ROOK_TEXTURE], NULL, &piece);
+                break;
+            case PIECE_BKNIGHT:
+                SDL_RenderCopy(sdlRenderer, pieceTextures[DARK_KNIGHT_TEXTURE], NULL, &piece);
+                break;
+            case PIECE_BBISHOP:
+                SDL_RenderCopy(sdlRenderer, pieceTextures[DARK_BISHOP_TEXTURE], NULL, &piece);
+                break;
+            case PIECE_BQUEEN:
+                SDL_RenderCopy(sdlRenderer, pieceTextures[DARK_QUEEN_TEXTURE], NULL, &piece);
+                break;
+            case PIECE_BKING:
+                SDL_RenderCopy(sdlRenderer, pieceTextures[DARK_KING_TEXTURE], NULL, &piece);
+                break;
+            }
             x += xInc;
 
             if (lightChecker)
