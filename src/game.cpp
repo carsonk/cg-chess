@@ -19,6 +19,8 @@
 */
 
 #include "game.h"
+#include "render.h"
+#include "SDL_log.h"
 
 Position currentPosition;
 StateListPtr States(new std::deque<StateInfo>(1));
@@ -28,10 +30,11 @@ const char *startFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 
 BOARD_STATE boardState = {};
 
-Move moveAttempt = MOVE_NONE;
 GAME_STATUS gameStatus = GSTATUS_NOCHANGE;
 
 BOARD_STATE getEmptyBoard(void);
+
+Square fromSquare = SQ_NONE;
 
 bool Game_Init(void)
 {
@@ -44,6 +47,7 @@ bool Game_Init(void)
     Threads.init();
     Tablebases::init(Options["SyzygyPath"]);
 
+    States = StateListPtr(new std::deque<StateInfo>(1));
     currentPosition.set(startFEN, false, &States->back(), Threads.main());
 
     boardState = getEmptyBoard();
@@ -54,8 +58,43 @@ bool Game_Init(void)
 
 void Game_Logic(uint32_t currentTick)
 {
+    Rank rank = RANK_NB;
+    File file = FILE_NB;
+    Square square = SQ_NONE;
+    Move moveAttempt = MOVE_NONE;
+    StateInfo st;
 
-    if (moveAttempt != MOVE_NONE && moveAttempt != MOVE_NULL) {
+    if (userClickedTileLastFrame) 
+    {
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Clicked rank/file: %d / %d", lastFrameClickedRank, lastFrameClickedFile);
+        
+        rank = (Rank)lastFrameClickedRank;
+        file = (File)lastFrameClickedFile;
+        square = make_square(file, rank);
+
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Stockfish tile no: %d", square);
+
+        if (fromSquare == square && fromSquare != SQ_NONE)
+        {
+            // If the square is clicked again, clear it.
+            fromSquare = SQ_NONE;
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Source square was clicked. Unselecting...", square);
+        }
+        else if (fromSquare != SQ_NONE)
+        {
+            // If a different target square is clicked, build a move attempt.
+            moveAttempt = make_move(fromSquare, square);
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Constructing move attempt.", square);
+            fromSquare = SQ_NONE;
+        }
+        else
+        {
+            fromSquare = square;
+        }
+    }
+
+    if (moveAttempt != MOVE_NONE && moveAttempt != MOVE_NULL) 
+    {
         if (currentPosition.legal(moveAttempt)) {
             // Move is legal. Update board state, change move, etc.
 
@@ -64,11 +103,15 @@ void Game_Logic(uint32_t currentTick)
             if (currentPosition.gives_check(moveAttempt))
                 gameStatus = GSTATUS_MOVE_SUCCESS_CHECK;
 
-            currentPosition.do_move(moveAttempt, States->back());
+            currentPosition.do_move(moveAttempt, st);
+
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Move performed.", square);
         } else {
             // Move is not legal.
 
             gameStatus = GSTATUS_MOVE_INVALID;
+
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Illegal move!", square);
         }
     } else {
         gameStatus = GSTATUS_NOCHANGE;

@@ -71,9 +71,6 @@ typedef enum {
 // The current state of the board.
 extern BOARD_STATE boardState;
 
-// Logic will check for this value and handle it on each round.
-extern Move moveAttempt;
-
 // The current status of the game module.
 extern GAME_STATUS gameStatus;
 
