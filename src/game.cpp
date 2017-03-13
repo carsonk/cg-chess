@@ -37,6 +37,10 @@ void refreshBoardState(Position *newPosition);
 
 Square fromSquare = SQ_NONE;
 
+inline bool IsCorrectSide(Position &position, Move moveAttempt) {
+    return color_of(position.moved_piece(moveAttempt)) == position.side_to_move();
+}
+
 bool Game_Init(void)
 {
     UCI::init(Options);
@@ -91,7 +95,7 @@ void Game_Logic(uint32_t currentTick)
 
     if (moveAttempt != MOVE_NONE && moveAttempt != MOVE_NULL) 
     {
-        if (currentPosition.legal(moveAttempt)) {
+        if (IsCorrectSide(currentPosition, moveAttempt) && currentPosition.legal(moveAttempt)) {
             // Move is legal. Update board state, change move, etc.
 
             gameStatus = GSTATUS_MOVE_SUCCESS;
