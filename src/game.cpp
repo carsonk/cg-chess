@@ -59,19 +59,14 @@ bool Game_Init(void)
 
 void Game_Logic(uint32_t currentTick)
 {
-    Rank rank = RANK_NB;
-    File file = FILE_NB;
     Square square = SQ_NONE;
     Move moveAttempt = MOVE_NONE;
-    StateInfo st;
+    StateInfo *st = nullptr;
 
     if (userClickedTileLastFrame) 
     {
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Clicked rank/file: %d / %d", lastFrameClickedRank, lastFrameClickedFile);
-        
-        rank = (Rank)lastFrameClickedRank;
-        file = (File)lastFrameClickedFile;
-        square = make_square(file, rank);
+        square = make_square((File)lastFrameClickedFile, (Rank)lastFrameClickedRank);
 
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Stockfish tile no: %d", square);
 
@@ -104,7 +99,9 @@ void Game_Logic(uint32_t currentTick)
             if (currentPosition.gives_check(moveAttempt))
                 gameStatus = GSTATUS_MOVE_SUCCESS_CHECK;
 
-            currentPosition.do_move(moveAttempt, st);
+            st = new StateInfo();
+            States->push_back(*st);
+            currentPosition.do_move(moveAttempt, *st);
 
             // Refresh our board state.
             refreshBoardState(&currentPosition);
